@@ -40,10 +40,10 @@ body {
   margin: 25px 15px 25px 0;
 }
 
-#webcam {
+#preview {
 	margin-top: 15px;
-    width: 100%;
-    background-color: #666;
+  width: 100%;
+  background-color: #666;
 }
 
 .scanbtn {
