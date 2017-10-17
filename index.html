@@ -50,62 +50,74 @@
         </div><!-- /.navbar-collapse -->
       </div><!-- /.container-fluid -->
     </nav>
-    <section class="scan_page">
-      <div class="wrapper">
-      	<div class="container container-white">
-      		<div class="row">
-      			<div class="col-md-offset-0 col-md-6 col-sm-9">
-      				<h1>Scandog</h1>
-      				<p>Scan your product, and we can send it to your home!</p>
-      			</div>
-            <div class="col-sm-6 col-sm-offset-3 col-md-offset-0 col-md-6">
-              <video id="preview">
 
-              </video>
-              </div>
-              <div class="col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-6">
-                <div class="output">
+    <div id="main_page">
+      <transition name="slide-fade" mode="in-out">
+        <section v-if="page == 'scan'" class="scan_page page" key="scan">
+          <div class="wrapper">
+          	<div class="container container-white">
+          		<div class="row">
+          			<div class="col-md-offset-0 col-md-6 col-sm-9">
+          				<h1>Scandog</h1>
+          				<p>Scan your product, and we can send it to your home!</p>
+          			</div>
+                <div class="col-sm-6 col-sm-offset-3 col-md-offset-0 col-md-6">
+                  <video id="preview">
 
+                  </video>
+                  </div>
+                  <div class="col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-6">
+                    <div class="output">
+                      <button @click="page = 'list'">
+                        List
+                      </button>
+                    </div>
+                  </div>
+          		</div>
+
+          	</div>
+
+            <div class="container container-white margin-top margin-bottom">
+              <div class="row">
+                <div class="col-md-6 col-sm-12">
+                  <h1>Scandog</h1>
+                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a sodales enim. Maecenas in ipsum eget enim luctus gravida. Donec a commodo mauris. Maecenas eu elit hendrerit, cursus diam congue, euismod lorem. Donec gravida tortor velit, euismod laoreet justo lobortis eget. Integer lobortis lobortis risus, nec iaculis urna venenatis quis. Quisque id ullamcorper ligula. Ut ut malesuada elit. In lectus augue, egestas non urna et, laoreet feugiat tortor. Quisque vel odio imperdiet tortor tincidunt rhoncus at in turpis. Nam risus nibh, ullamcorper sed ipsum quis, lobortis vestibulum quam. Suspendisse interdum erat id ligula rhoncus feugiat. Morbi eu sagittis lacus.</p>
                 </div>
+                <div class="col-md-6 col-sm-12">
+                  <h1>Scandog</h1>
+                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a sodales enim. Maecenas in ipsum eget enim luctus gravida. Donec a commodo mauris. Maecenas eu elit hendrerit, cursus diam congue, euismod lorem. Donec gravida tortor velit, euismod laoreet justo lobortis eget. Integer lobortis lobortis risus, nec iaculis urna venenatis quis. Quisque id ullamcorper ligula. Ut ut malesuada elit. In lectus augue, egestas non urna et, laoreet feugiat tortor. Quisque vel odio imperdiet tortor tincidunt rhoncus at in turpis. Nam risus nibh, ullamcorper sed ipsum quis, lobortis vestibulum quam. Suspendisse interdum erat id ligula rhoncus feugiat. Morbi eu sagittis lacus.</p>
+                </div>
+
               </div>
-      		</div>
 
-      	</div>
-
-        <div class="container container-white margin-top margin-bottom">
-          <div class="row">
-            <div class="col-md-6 col-sm-12">
-              <h1>Scandog</h1>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a sodales enim. Maecenas in ipsum eget enim luctus gravida. Donec a commodo mauris. Maecenas eu elit hendrerit, cursus diam congue, euismod lorem. Donec gravida tortor velit, euismod laoreet justo lobortis eget. Integer lobortis lobortis risus, nec iaculis urna venenatis quis. Quisque id ullamcorper ligula. Ut ut malesuada elit. In lectus augue, egestas non urna et, laoreet feugiat tortor. Quisque vel odio imperdiet tortor tincidunt rhoncus at in turpis. Nam risus nibh, ullamcorper sed ipsum quis, lobortis vestibulum quam. Suspendisse interdum erat id ligula rhoncus feugiat. Morbi eu sagittis lacus.</p>
-            </div>
-            <div class="col-md-6 col-sm-12">
-              <h1>Scandog</h1>
-              <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce a sodales enim. Maecenas in ipsum eget enim luctus gravida. Donec a commodo mauris. Maecenas eu elit hendrerit, cursus diam congue, euismod lorem. Donec gravida tortor velit, euismod laoreet justo lobortis eget. Integer lobortis lobortis risus, nec iaculis urna venenatis quis. Quisque id ullamcorper ligula. Ut ut malesuada elit. In lectus augue, egestas non urna et, laoreet feugiat tortor. Quisque vel odio imperdiet tortor tincidunt rhoncus at in turpis. Nam risus nibh, ullamcorper sed ipsum quis, lobortis vestibulum quam. Suspendisse interdum erat id ligula rhoncus feugiat. Morbi eu sagittis lacus.</p>
             </div>
 
           </div>
+        </section>
+        <section v-if="page == 'list'" class="list_page page" key="list">
+            <p >Look at me!</p>
+            <button @click="page = 'scan'; init_scanner()">
+              Terug
+            </button>
+        </section>
+        <section v-if="page == 'product'" class="product_page page" key="product">
 
-        </div>
+        </section>
+      </transition>
+    </div>
 
-      </div>
-    </section>
-    <section class="list_page">
-
-    </section>
-    <section class="product_page">
-
-    </section>
     <script src="js/request.js"></script>
     <script type="text/javascript">
-      let scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+    var vue = new Vue({
+      el: "#main_page",
+      data: {
+        page:"scan"
+      }
+    });
+    var init_scanner = function(){
+      var scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
       scanner.addListener('scan', function (content) {
-        try {
-          json_obj = JSON.parse(Get("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XChannel-Site/-/categories/Producten" + content));
-          console.log(json_obj);
-        }
-        catch(err) {
-          console.log("Error");
-        }
+        vue.$data.page = "list";
       });
       Instascan.Camera.getCameras().then(function (cameras) {
         if (cameras.length > 0) {
@@ -116,6 +128,8 @@
       }).catch(function (e) {
         console.error(e);
       });
+    }
+    init_scanner();
     </script>
     </body>
 </html>

@@ -17,7 +17,7 @@ body {
   margin-bottom: 15px;
 
 }
- 
+
 
   /* navbar */
 .navbar-inverse {
@@ -49,4 +49,26 @@ body {
 .scanbtn {
   width: 100%;
   border-style: none;
+}
+
+#main_page{
+	overflow: hidden;
+}
+
+.list_page{
+	width: 100%;
+	background-color: black;
+	color:white;
+	height: 200px;
+}
+.slide-fade-enter-active {
+  transition: all 1s ease;
+}
+.slide-fade-leave-active {
+  transition: all 1s ease;
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active below version 2.1.8 */ {
+  transform: translateX(100%);
+  opacity: 0;
 }
