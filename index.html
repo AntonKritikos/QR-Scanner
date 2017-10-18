@@ -60,7 +60,7 @@
           				<p>Scan your product, and we can send it to your home!</p>
           			</div>
                 <div class="col-sm-6 col-sm-offset-3 col-md-offset-0 col-md-6">
-                  <qrcode-reader @capture="onCapture">
+                  <qrcode-reader @capture="onCapture" id="preview">
                   </qrcode-reader>
                   </div>
                   <div class="col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-6">
@@ -105,7 +105,6 @@
     <link rel="stylesheet" href="vue-qrcode-reader/dist/vue-qrcode-reader.css"/>
     <script src="js/vue.js"></script>
     <script src="vue-qrcode-reader/dist/vue-qrcode-reader.browser.js"></script>
-    <script src="js/request.js"></script>
     <script type="text/javascript">
     var json_obj = {};
     var vue = new Vue({
@@ -119,9 +118,16 @@
           if (event === null) {
             // no QR-Code dected since last capture
           } else {
-            vue.$data.data = event.result
+            vue.$data.data = JSON.parse(vue.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/categories/products/"+event.result));
+            vue.$data.page = "list";
             event.points // array of QR-Code module positions
           }
+        },
+        getJson (yourUrl){
+            var Httpreq = new XMLHttpRequest(); // a new request
+            Httpreq.open("GET",yourUrl,false);
+            Httpreq.send(null);
+            return Httpreq.responseText;
         }
       }
     });
