@@ -6,8 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="assets/scandog.png">
-    <script type="text/javascript" src="js/instascan.min.js"></script>
-    <script type="text/javascript" src="js/vue.js"></script>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
@@ -62,9 +60,8 @@
           				<p>Scan your product, and we can send it to your home!</p>
           			</div>
                 <div class="col-sm-6 col-sm-offset-3 col-md-offset-0 col-md-6">
-                  <video id="preview">
-
-                  </video>
+                  <qrcode-reader @capture="onCapture">
+                  </qrcode-reader>
                   </div>
                   <div class="col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-6">
                     <div class="output">
@@ -95,8 +92,8 @@
           </div>
         </section>
         <section v-if="page == 'list'" class="list_page page" key="list">
-            <p >Look at me!</p>
-            <button @click="page = 'scan'; init_scanner()">
+            {{data.name}}
+            <button @click="page = 'scan';">
               Terug
             </button>
         </section>
@@ -105,31 +102,29 @@
         </section>
       </transition>
     </div>
-
+    <link rel="stylesheet" href="vue-qrcode-reader/dist/vue-qrcode-reader.css"/>
+    <script src="js/vue.js"></script>
+    <script src="vue-qrcode-reader/dist/vue-qrcode-reader.browser.js"></script>
     <script src="js/request.js"></script>
     <script type="text/javascript">
+    var json_obj = {};
     var vue = new Vue({
       el: "#main_page",
       data: {
-        page:"scan"
+        page:"scan",
+        data:json_obj
+      },
+      methods: {
+        onCapture (event) {
+          if (event === null) {
+            // no QR-Code dected since last capture
+          } else {
+            vue.$data.data = event.result
+            event.points // array of QR-Code module positions
+          }
+        }
       }
     });
-    var init_scanner = function(){
-      var scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-      scanner.addListener('scan', function (content) {
-        vue.$data.page = "list";
-      });
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(cameras[0]);
-        } else {
-          console.error('No cameras found.');
-        }
-      }).catch(function (e) {
-        console.error(e);
-      });
-    }
-    init_scanner();
     </script>
     </body>
 </html>

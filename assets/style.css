@@ -54,6 +54,9 @@ body {
 #main_page{
 	overflow: hidden;
 }
+.page{
+	position:relative;  	
+}
 
 .list_page{
 	width: 100%;
