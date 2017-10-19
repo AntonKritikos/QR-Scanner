@@ -55,7 +55,8 @@ body {
 	overflow: hidden;
 }
 .page{
-	position:relative;  	
+	position:absolute;
+	width: 100%;
 }
 
 .list_page{

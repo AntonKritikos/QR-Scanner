@@ -14,41 +14,6 @@
   </head>
   <body>
 
-    <nav class="navbar navbar-inverse navbar-static-top">
-      <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">
-          	<img alt="Scandog logo" src="assets/scandoglogo.png
-          	">
-          </a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Link</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Separated link</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
-    </nav>
-
     <div id="main_page">
       <transition name="slide-fade" mode="in-out">
         <section v-if="page == 'scan'" class="scan_page page" key="scan">
@@ -65,7 +30,7 @@
                   </div>
                   <div class="col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-6">
                     <div class="output">
-                      <button @click="page = 'list'">
+                      <button @click="cheatButton('Weber barbecue')">
                         List
                       </button>
                     </div>
@@ -92,46 +57,33 @@
           </div>
         </section>
         <section v-if="page == 'list'" class="list_page page" key="list">
-            {{data.name}}
-            <button @click="page = 'scan';">
-              Terug
-            </button>
+          <transition-group mode="out-in" name="slide-fade" class="list">
+            <div class="items" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
+              {{value.title}}
+            </div>
+          </transition-group>
+          <button @click="prev()" v-show="offset > 0">
+            Prev
+          </button>
+          <button @click="next()" v-show="offset < data.elements.length">
+            Next
+          </button>
+          <button @click="changePage('scan')">
+            Terug
+          </button>
         </section>
         <section v-if="page == 'product'" class="product_page page" key="product">
-
+          {{product}}
+          <button @click="changePage('list')">
+            Terug
+          </button>
         </section>
       </transition>
     </div>
     <link rel="stylesheet" href="vue-qrcode-reader/dist/vue-qrcode-reader.css"/>
     <script src="js/vue.js"></script>
     <script src="vue-qrcode-reader/dist/vue-qrcode-reader.browser.js"></script>
-    <script type="text/javascript">
-    var json_obj = {};
-    var vue = new Vue({
-      el: "#main_page",
-      data: {
-        page:"scan",
-        data:json_obj
-      },
-      methods: {
-        onCapture (event) {
-          if (event === null) {
-            // no QR-Code dected since last capture
-          } else {
-            vue.$data.data = JSON.parse(vue.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/categories/products/"+event.result));
-            vue.$data.page = "list";
-            event.points // array of QR-Code module positions
-          }
-        },
-        getJson (yourUrl){
-            var Httpreq = new XMLHttpRequest(); // a new request
-            Httpreq.open("GET",yourUrl,false);
-            Httpreq.send(null);
-            return Httpreq.responseText;
-        }
-      }
-    });
-    </script>
+    <script src="js/master.js"></script>
     </body>
 </html>
 <!DOCTYPE html>
