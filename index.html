@@ -6,8 +6,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="assets/scandog.png">
-    <script type="text/javascript" src="js/instascan.min.js"></script>
-    <script type="text/javascript" src="js/vue.js"></script>
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
@@ -15,41 +13,6 @@
     <link href="assets/style.css" rel="stylesheet" type="text/css">
   </head>
   <body>
-
-    <nav class="navbar navbar-inverse navbar-static-top">
-      <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">
-          	<img alt="Scandog logo" src="assets/scandoglogo.png
-          	">
-          </a>
-        </div>
-
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Link</a></li>
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="#">Separated link</a></li>
-              </ul>
-            </li>
-          </ul>
-        </div><!-- /.navbar-collapse -->
-      </div><!-- /.container-fluid -->
-    </nav>
 
     <div id="main_page">
       <transition name="slide-fade" mode="in-out">
@@ -62,13 +25,12 @@
           				<p>Scan your product, and we can send it to your home!</p>
           			</div>
                 <div class="col-sm-6 col-sm-offset-3 col-md-offset-0 col-md-6">
-                  <video id="preview">
-
-                  </video>
+                  <qrcode-reader @capture="onCapture" id="preview">
+                  </qrcode-reader>
                   </div>
                   <div class="col-sm-6 col-sm-offset-3 col-md-6 col-md-offset-6">
                     <div class="output">
-                      <button @click="page = 'list'">
+                      <button @click="cheatButton('Weber barbecue')">
                         List
                       </button>
                     </div>
@@ -95,42 +57,33 @@
           </div>
         </section>
         <section v-if="page == 'list'" class="list_page page" key="list">
-            <p >Look at me!</p>
-            <button @click="page = 'scan'; init_scanner()">
-              Terug
-            </button>
+          <transition-group mode="out-in" name="slide-fade" class="list">
+            <div class="items" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
+              {{value.title}}
+            </div>
+          </transition-group>
+          <button @click="prev()" v-show="offset > 0">
+            Prev
+          </button>
+          <button @click="next()" v-show="offset < data.elements.length">
+            Next
+          </button>
+          <button @click="changePage('scan')">
+            Terug
+          </button>
         </section>
         <section v-if="page == 'product'" class="product_page page" key="product">
-
+          {{product}}
+          <button @click="changePage('list')">
+            Terug
+          </button>
         </section>
       </transition>
     </div>
-
-    <script src="js/request.js"></script>
-    <script type="text/javascript">
-    var vue = new Vue({
-      el: "#main_page",
-      data: {
-        page:"scan"
-      }
-    });
-    var init_scanner = function(){
-      var scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-      scanner.addListener('scan', function (content) {
-        vue.$data.page = "list";
-      });
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(cameras[0]);
-        } else {
-          console.error('No cameras found.');
-        }
-      }).catch(function (e) {
-        console.error(e);
-      });
-    }
-    init_scanner();
-    </script>
+    <link rel="stylesheet" href="vue-qrcode-reader/dist/vue-qrcode-reader.css"/>
+    <script src="js/vue.js"></script>
+    <script src="vue-qrcode-reader/dist/vue-qrcode-reader.browser.js"></script>
+    <script src="js/master.js"></script>
     </body>
 </html>
 <!DOCTYPE html>

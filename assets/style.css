@@ -54,6 +54,10 @@ body {
 #main_page{
 	overflow: hidden;
 }
+.page{
+	position:absolute;
+	width: 100%;
+}
 
 .list_page{
 	width: 100%;
