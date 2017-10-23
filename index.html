@@ -59,7 +59,7 @@
         <section v-if="page == 'list'" class="list_page page" key="list">
           <transition-group mode="out-in" name="slide-fade" class="list">
             <div class="items" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
-              {{value.title}}
+              <img v-bind:src="getImage(value.attributes[0].value)" alt="">{{value.title}}
             </div>
           </transition-group>
           <button @click="prev()" v-show="offset > 0">
@@ -73,7 +73,7 @@
           </button>
         </section>
         <section v-if="page == 'product'" class="product_page page" key="product">
-          {{product}}
+          <img v-bind:src="product.imageLink" alt="">{{product}}
           <button @click="changePage('list')">
             Terug
           </button>

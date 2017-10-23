@@ -7,7 +7,8 @@ var vue = new Vue({
     offset : 0,
     amount : 5,
     product : {},
-    result : ''
+    result : '',
+    image : ''
   },
   methods : {
     onCapture (event) {
@@ -26,13 +27,17 @@ var vue = new Vue({
     },
     onDecode(result){
       Vue.set(vue, 'offset', 0);
-      Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku&searchTerm="+result)));
-      Vue.set(vue, 'result', result)
-      if (this.$data.data.elements.length == 1) {
-        this.viewProduct(this.$data.data.elements[0].attributes[0].value);
-      }
-      else {
-        this.changePage('list');
+      try {
+        Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku&searchTerm="+result)));
+        Vue.set(vue, 'result', result)
+        if (this.$data.data.elements.length == 1) {
+          this.viewProduct(this.$data.data.elements[0].attributes[0].value);
+        }
+        else {
+          this.changePage('list');
+        }
+      } catch (e) {
+        alert("Error");
       }
     },
     cheatButton (result,event) {
@@ -43,6 +48,7 @@ var vue = new Vue({
     },
     viewProduct (id) {
       Vue.set(vue, 'product',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/"+id)));
+      Vue.set(vue.product, 'imageLink', this.getImage(id))
       this.changePage('product')
     },
     next (){
@@ -52,6 +58,9 @@ var vue = new Vue({
     prev (){
       Vue.set(vue, 'offset', this.offset - 5);
       Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku&searchTerm="+this.$data.result)));
+    },
+    getImage (data){
+      return "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/XS/"+data+".jpg";
     }
   }
 });
