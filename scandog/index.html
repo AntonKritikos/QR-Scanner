@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Scandog</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="assets/scandog.png">
+    <script type="text/javascript" src="js/instascan.min.js"></script>
+    <script type="text/javascript" src="js/vue.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.8.1/css/tachyons.min.css"/>
+    <link href="assets/style.css" rel="stylesheet" type="text/css">
+    <link href="assets/themify-icons.css" rel="stylesheet" type="text/css">
+  </head>
+  <body>
+
+    <div id="main_page">
+      <transition name="slide-fade" mode="in-out">
+        <section v-if="page == 'scan'" class="scan_page page" key="scan">
+          <div class="wrapper">
+          	
+            <div class="fl w-100">
+              <video id="preview">
+
+              </video>
+            </div>
+
+
+            <div class="fl w-100 bg-light-green">
+      				<div class="w-80 mscan">
+                <h1>Scan een qr code</h1>
+                <span class="ti-arrow-top-left"></span>
+             </div>
+      			</div>
+
+            <div class="fl w-100">
+              <div class="w-80 mscan">
+                <h3>Wilt u een product die u eerder heeft besteld opnieuw bestellen?</h3>
+                <h3>Scan de qr code op het product en dit gaat heel gemakkelijk </h3>
+              </div>
+            </div>
+            
+            <div class="fl w-third">
+              <div class="output">
+              
+              </div>
+            </div>
+            
+          </div>
+
+        </section>
+
+       
+
+
+
+        <section v-if="page == 'list'" class="list_page page" key="list">
+            <p >Look at me!</p>
+            <button @click="page = 'scan'; init_scanner()">
+              Terug
+            </button>
+        </section>
+        <section v-if="page == 'product'" class="product_page page" key="product">
+
+        </section>
+      </transition>
+       <div v-if="page" class="footer bg-light-green tc">
+          ye
+        </div>
+    </div>
+
+
+
+    <script src="js/request.js"></script>
+    <script type="text/javascript">
+    var vue = new Vue({
+      el: "#main_page",
+      data: {
+        page:"scan"
+      }
+    });
+    var init_scanner = function(){
+      var scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
+      scanner.addListener('scan', function (content) {
+        vue.$data.page = "list";
+      });
+      Instascan.Camera.getCameras().then(function (cameras) {
+        if (cameras.length > 0) {
+          scanner.start(cameras[0]);
+        } else {
+          console.error('No cameras found.');
+        }
+      }).catch(function (e) {
+        console.error(e);
+      });
+    }
+    init_scanner();
+    </script>
+  </body>
+</html>
+<!DOCTYPE html>
+<html>
