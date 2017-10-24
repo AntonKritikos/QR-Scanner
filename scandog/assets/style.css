@@ -1,20 +1,20 @@
 @font-face {
 font-family: "themify";
-src: url("/assets/fonts/themify/themify.eot");
+src: url("./fonts/themify/themify.eot");
 src: 
-url("/assets/fonts/themify/themify.woff") format("woff"),
-url("/assets/fonts/themify/themify.ttf") format("truetype"),
-url("/assets/fonts/themify/themify.svg#filename") format("svg");
+url("./fonts/themify/themify.woff") format("woff"),
+url("./fonts/themify/themify.ttf") format("truetype"),
+url("./fonts/themify/themify.svg#filename") format("svg");
 }
 
 @font-face {
 font-family: "formata-condensed";
-src: url("/assets/fonts/formata/formata.eot");
+src: url("./fonts/formata/formata.eot");
 src: 
-url("/assets/fonts/formata/formata.woff") format("woff"),
-url("/assets/fonts/formata/formata.woff2") format("woff2"),
-url("/assets/fonts/formata/formata.ttf") format("truetype"),
-url("/assets/fonts/formata/formata.svg#filename") format("svg");
+url("./fonts/formata/formata.woff") format("woff"),
+url("./fonts/formata/formata.woff2") format("woff2"),
+url("./fonts/formata/formata.ttf") format("truetype"),
+url("./fonts/formata/formata.svg#filename") format("svg");
 }
 
 

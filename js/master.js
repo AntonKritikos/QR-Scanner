@@ -37,7 +37,7 @@ var vue = new Vue({
           this.changePage('list');
         }
       } catch (e) {
-        alert("Error");
+        alert("Hij niet doet");
       }
     },
     cheatButton (result,event) {

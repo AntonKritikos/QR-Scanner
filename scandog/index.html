@@ -2,12 +2,8 @@
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Scandog</title>
+    <title>Sellsmart API</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="assets/scandog.png">
-    <script type="text/javascript" src="js/instascan.min.js"></script>
-    <script type="text/javascript" src="js/vue.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/tachyons@4.8.1/css/tachyons.min.css"/>
     <link href="assets/style.css" rel="stylesheet" type="text/css">
@@ -21,9 +17,8 @@
           <div class="wrapper">
           	
             <div class="fl w-100">
-              <video id="preview">
-
-              </video>
+              <qrcode-reader @capture="onCapture" id="preview">
+              </qrcode-reader>
             </div>
 
 
@@ -56,47 +51,39 @@
 
 
         <section v-if="page == 'list'" class="list_page page" key="list">
-            <p >Look at me!</p>
-            <button @click="page = 'scan'; init_scanner()">
-              Terug
-            </button>
+            <transition-group mode="out-in" name="slide-fade" class="list">
+            <div class="items" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
+              <img v-bind:src="getImage(value.attributes[0].value)" alt="">{{value.title}}
+            </div>
+          </transition-group>
+          <button @click="prev()" v-show="offset > 0">
+            Prev
+          </button>
+          <button @click="next()" v-show="offset < data.elements.length">
+            Next
+          </button>
+          <button @click="changePage('scan')">
+            Terug
+          </button>
         </section>
+		
         <section v-if="page == 'product'" class="product_page page" key="product">
-
+		  <img v-bind:src="product.imageLink" alt="">{{product}}
+          <button @click="changePage('list')">
+            Terug
+          </button>
         </section>
+		
       </transition>
        <div v-if="page" class="footer bg-light-green tc">
           ye
         </div>
     </div>
-
-
-
-    <script src="js/request.js"></script>
-    <script type="text/javascript">
-    var vue = new Vue({
-      el: "#main_page",
-      data: {
-        page:"scan"
-      }
-    });
-    var init_scanner = function(){
-      var scanner = new Instascan.Scanner({ video: document.getElementById('preview') });
-      scanner.addListener('scan', function (content) {
-        vue.$data.page = "list";
-      });
-      Instascan.Camera.getCameras().then(function (cameras) {
-        if (cameras.length > 0) {
-          scanner.start(cameras[0]);
-        } else {
-          console.error('No cameras found.');
-        }
-      }).catch(function (e) {
-        console.error(e);
-      });
-    }
-    init_scanner();
-    </script>
+	
+    <link rel="stylesheet" href="vue-qrcode-reader/dist/vue-qrcode-reader.css"/>
+    <script src="js/vue.js"></script>
+    <script src="vue-qrcode-reader/dist/vue-qrcode-reader.browser.js"></script>
+    <script src="js/master.js"></script>
   </body>
 </html>
 <!DOCTYPE html>
