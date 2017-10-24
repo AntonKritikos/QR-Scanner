@@ -54,15 +54,16 @@
 
 
         <section v-if="page == 'list'" class="list_page page fl w-100" key="list">
-          <div class="fl w-10 h-100"></div>
           <div @click="prev()" v-show="offset > 0" class="buttons prev w-80 h-10 bg-light-green">
             Prev
           </div>
+          <div>
             <transition-group mode="out-in" name="slide-fade" class="list">
-              <div class="items fl w-80" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
+              <div class="items fl w-100 ph6" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
                 <img v-bind:src="getImage(value.attributes[0].value)" alt="">{{value.title}}
               </div>
             </transition-group>
+          </div>
           <div @click="next()" v-show="offset < data.elements.length" class="buttons next w-80 h-10 bg-light-green">
             Next
           </div>
