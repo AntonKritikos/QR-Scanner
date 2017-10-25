@@ -28,7 +28,7 @@ var vue = new Vue({
     onDecode(result){
       Vue.set(vue, 'offset', 0);
       try {
-        Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku&searchTerm="+result)));
+        Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku,salePrice&searchTerm="+result)));
         Vue.set(vue, 'result', result)
         if (this.$data.data.elements.length == 1) {
           this.viewProduct(this.$data.data.elements[0].attributes[0].value);
