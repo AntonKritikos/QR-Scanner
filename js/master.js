@@ -56,8 +56,10 @@ var vue = new Vue({
       Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku&searchTerm="+this.$data.result)));
     },
     prev (){
-      Vue.set(vue, 'offset', this.offset - 5);
-      Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku&searchTerm="+this.$data.result)));
+      if (this.$data.offset >0) {
+        Vue.set(vue, 'offset', this.offset - 5);
+        Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku&searchTerm="+this.$data.result)));
+      }
     },
     getImage (data){
       return "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/XS/"+data+".jpg";
