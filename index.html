@@ -14,6 +14,7 @@
 <body>
 
   <div id="main_page">
+    <!--Scan page-->
     <transition name="slide-fade" mode="in-out">
       <section v-if="page == 'scan'" class="scan_page page" key="scan">
         <div class="wrapper">
@@ -30,7 +31,6 @@
           <div class="fl w-100 bg-light-green">
             <div class="w-80 mscan">
               <h1>Scan een qr code</h1>
-              <span class="ti-arrow-top-left"></span>
             </div>
           </div>
 
@@ -53,35 +53,36 @@
 
 
 
-
+      <!--Product list-->
 
       <section v-if="page == 'list'" class="list_page page fl w-100" key="list">
-        <div>
-          <transition-group mode="out-in" name="slide-fade" class="list">
-            <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
-
-              <div class="picdiv">
-                <img v-bind:src="getImage(value.attributes[0].value)" alt="">
-              </div>
-
-              <div class="productinfo">
-                <p>Naam:{{value.title}}</p>
-                <p v-show="value.attributes[1]">Prijs: € {{value.attributes[1].value.value}}</p>
-                <p>Descriptie: {{value.description | limitWords(5)}}</p>
-              </div>
-
+        <div class="itemlist">
+          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
+            <div class="picdiv">
+              <img v-bind:src="getImage(value.attributes[0].value)" alt="">
             </div>
-          </transition-group>
+            <div class="productinfo">
+              <p>Naam:{{value.title}}</p>
+              <p v-show="value.attributes[1]">Prijs: € {{value.attributes[1].value.value}}</p>
+              <p>Descriptie: {{value.description | limitWords(5)}}</p>
+            </div>
+          </div>
         </div>
-        <div @click="next()" v-show="offset < data.elements.length" class="buttons next w-80 h-10 bg-light-green">
-          Next
+        <div class="listnav bg-green">
+          <span @click="prev()" class="ti-angle-double-left listnavbuttons"></span>
+          <span @click="next()" class="ti-angle-double-right listnavbuttons fr"></span>
+          <div class="tc">
+            <button @click="changePage('scan')" class="backbtn bg-light-green">
+              Terug
+            </button>
+          </div>
         </div>
-        <button @click="changePage('scan')">
-            Terug
-          </button>
+
+
+
       </section>
 
-      <!--product pagina -->
+      <!--Product detail page -->
 
       <section v-if="page == 'product'" class="product_page page" key="product">
         <img v-bind:src="product.imageLink" alt="">{{product.name}}
@@ -92,6 +93,8 @@
             Terug
           </button>
       </section>
+
+
 
     </transition>
     <div v-if="page" class="footer bg-light-green tc">
@@ -106,5 +109,3 @@
 </body>
 
 </html>
-<!DOCTYPE html>
-<html>
