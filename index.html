@@ -59,38 +59,35 @@
         <div @click="prev()" v-show="offset > 0" class="buttons prev w-80 h-10 bg-light-green">
           Prev
         </div>
-        <div>
-          <transition-group mode="out-in" name="slide-fade" class="list">
-            <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
+        <div class="itemlist">
+         
+          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
 
-              <div class="picdiv">
-                <img v-bind:src="getImage(value.attributes[0].value)" alt="">
-              </div>
-
-              <div class="productinfo">
-                Naam: {{value.title}}<br>
-                Prijs: € {{value.attributes[1].value.value}}<br>
-                Descriptie: {{value.description | limitWords(5)}}<br>
-              </div>
-
+            <div class="picdiv">
+              <img v-bind:src="getImage(value.attributes[0].value)" alt="">
             </div>
-          </transition-group>
+
+            <div class="productinfo">
+              Naam: {{value.title}}<br>
+              Prijs: € {{value.attributes[1].value.value}}<br>
+              Descriptie: {{value.description | limitWords(5)}}<br>
+            </div>
+
+          </div>
+          
         </div>
 
         <div class="listnav bg-green">
-          <span class="ti-angle-double-left listnavbuttons"></span>
-          <span class="ti-angle-double-right listnavbuttons fr"></span>
+          <span @click="prev()" class="ti-angle-double-left listnavbuttons"></span>
+          <span @click="next()" class="ti-angle-double-right listnavbuttons fr"></span>
+          <div class="tc"> 
+            <button @click="changePage('scan')" class="backbtn bg-light-green">
+              Terug
+            </button>
+          </div>
         </div>
         
-        <div class="bg-green listnav tc"> 
-          <button @click="changePage('scan')" class="backbtn bg-light-green">
-            Terug
-          </button>
-        </div>
-
-        <div @click="next()" v-show="offset < data.elements.length" class="buttons next w-80 h-10">
-          Next
-        </div>
+        
 
       </section>
 
