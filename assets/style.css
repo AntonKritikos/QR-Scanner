@@ -94,7 +94,7 @@ body {
 
 .list_page {
   width: 100%;
-  background-color: black;
+  background-color: white;
   color: white;
   z-index: 30;
 }
@@ -147,10 +147,13 @@ body {
 
 .items {
   padding: 15px;
-  height: calc (16% - 1%);
-  margin-bottom: 1%;
+  margin-top: 4px;
   overflow: hidden;
   display: inline-block;
+}
+
+.items:first-child {
+  margin-top: 0px !important;
 }
 
 .picdiv {
@@ -164,7 +167,17 @@ body {
 
 .productinfo {
   float: left;
-  width: 80%;
+  width: 70%;
+  margin-left: 7%;
+}
+
+.listnav {
+  width: 100%;
+  float: left;
+}
+
+.listnavbuttons {
+  font-size: 24px;
 }
 
 @media screen and (min-width: 480px) {}
