@@ -62,5 +62,11 @@ var vue = new Vue({
     getImage (data){
       return "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/XS/"+data+".jpg";
     }
+  },
+  filters: {
+
+      truncate: function(string, value) {
+      return string.substring(0, value) + '...';
+    }
   }
 });

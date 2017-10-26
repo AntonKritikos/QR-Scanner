@@ -61,11 +61,18 @@
         </div>
         <div>
           <transition-group mode="out-in" name="slide-fade" class="list">
-            <div class="items fl w-100 ph6" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
-              <img v-bind:src="getImage(value.attributes[0].value)" alt=""><br>
-              Naam:{{value.title}}<br>
-              Prijs:{{value.attributes[1].value.value}}{{value.attributes[1].value.currencyMnemonic}}<br>
-              Descriptie:{{value.description}}<br>
+            <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
+              
+              <div class="picdiv">
+                <img v-bind:src="getImage(value.attributes[0].value)" alt="">
+              </div>
+
+              <div class="productinfo">
+                Naam:{{value.title}}<br>
+                Prijs: € {{value.attributes[1].value.value}}<br>
+                Descriptie: {{value.description | truncate '20'}}<br>
+              </div>  
+            
             </div>
           </transition-group>
         </div>
@@ -77,8 +84,13 @@
           </button>
       </section>
 
+      <!--product pagina -->
+
       <section v-if="page == 'product'" class="product_page page" key="product">
-        <img v-bind:src="product.imageLink" alt="">{{product}}
+        <img v-bind:src="product.imageLink" alt="">{{product.name}}
+        {{product.longDescription}}
+        {{product.salePrice}}
+
         <button @click="changePage('list')">
             Terug
           </button>
