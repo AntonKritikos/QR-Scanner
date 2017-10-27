@@ -157,6 +157,10 @@ body {
   height: 19.25%;
 }
 
+.items p {
+  margin: 0px;
+}
+
 .items:first-child {
   margin-top: 0px !important;
 }
