@@ -61,7 +61,7 @@
             <div class="picdiv">
               <img v-bind:src="getImage(value.attributes[0].value)" alt="">
             </div>
-            <div class="productinfo">e
+            <div class="productinfo">
               <p>Naam:{{value.title}}</p>
               <p>Prijs: € {{value.attributes[1].value.value}}</p>
               <p>Descriptie: {{value.description | limitWords(5)}}</p>
@@ -86,13 +86,16 @@
 
       <section v-if="page == 'product'" class="product_page page" key="product">
         <img v-bind:src="product.imageLink" alt="">
-        <div class="productname">
-          <h3>{{product.name}}</h3>
-        </div>
-        <div class="productdescription">
-          <p>{{product.longDescription}}</p>
-        </div>
-        <!--{{product.salePrice.value}}-->
+        <div class="pdp">
+          <div class="productname">
+            <h3>{{product.name}}</h3>
+          </div>
+          <div class="productdescription">
+            <p>{{product.longDescription}}</p>
+          </div>
+          € {{product.salePrice.value}}
+          {{product.salePrice.priceText}}
+        </div>  
 
         <button @click="changePage('list')">
             Terug

@@ -41,7 +41,7 @@ var vue = new Vue({
       try {
         Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku,salePrice&searchTerm="+this.$data.result)));
       } catch (e) {
-        alert("Hij niet doet");
+        alert("Er is een fout opgetreden bij het ophalen van data uit de database.");
       }
     },
     cheatButton (result,event) {

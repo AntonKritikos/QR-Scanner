@@ -90,6 +90,7 @@ body {
 .page {
   height: 100%;
   position: absolute;
+  width: 100%;
 }
 
 .list_page {
@@ -191,4 +192,29 @@ body {
   font-size: 30px;
 }
 
-@media screen and (min-width: 480px) {}
+.pdp {
+  padding: 0px 15px;
+}
+
+@media screen and (min-width: 766px) {
+  .productinfo {
+    font-size: 25px;
+  }
+  h3 {
+    font-size: 27px;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .productinfo {
+    font-size: 30px;
+  }
+  h3 {
+    font-size: 34px;
+  }
+}
+
+
+
+
+}
