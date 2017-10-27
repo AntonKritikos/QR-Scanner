@@ -25,17 +25,21 @@ var vue = new Vue({
         Httpreq.send(null);
         return Httpreq.responseText;
     },
-    onDecode(result){
+    onDecode (result){
       Vue.set(vue, 'offset', 0);
+      Vue.set(vue, 'result', result);
+      this.getData();
+      if (this.$data.data.elements.length == 1) {
+        this.viewProduct(this.$data.data.elements[0].attributes[0].value);
+      }
+      else {
+        this.changePage('list');
+      }
+
+    },
+    getData (){
       try {
-        Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku,salePrice&searchTerm="+result)));
-        Vue.set(vue, 'result', result)
-        if (this.$data.data.elements.length == 1) {
-          this.viewProduct(this.$data.data.elements[0].attributes[0].value);
-        }
-        else {
-          this.changePage('list');
-        }
+        Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku,salePrice&searchTerm="+this.$data.result)));
       } catch (e) {
         alert("Hij niet doet");
       }
@@ -53,12 +57,12 @@ var vue = new Vue({
     },
     next (){
       Vue.set(vue, 'offset', this.offset + 5);
-      Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku&searchTerm="+this.$data.result)));
+      this.getData();
     },
     prev (){
       if (this.$data.offset >0) {
         Vue.set(vue, 'offset', this.offset - 5);
-        Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku&searchTerm="+this.$data.result)));
+        this.getData();
       }
     },
     getImage (data){
