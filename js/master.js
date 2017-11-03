@@ -56,8 +56,10 @@ var vue = new Vue({
       this.changePage('product')
     },
     next (){
-      Vue.set(vue, 'offset', this.offset + 5);
-      this.getData();
+      if (this.$data.data.elements.length == 5) {
+        Vue.set(vue, 'offset', this.offset + 5);
+        this.getData();
+      }
     },
     prev (){
       if (this.$data.offset >0) {
