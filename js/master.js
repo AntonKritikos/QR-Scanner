@@ -8,7 +8,8 @@ var vue = new Vue({
     amount : 5,
     product : {},
     result : '',
-    image : ''
+    image : '',
+    temp : ''
   },
   methods : {
     onCapture (event) {
@@ -39,9 +40,12 @@ var vue = new Vue({
     },
     getData (){
       try {
-        Vue.set(vue, 'data',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku,salePrice&searchTerm="+this.$data.result)));
+        Vue.set(vue, 'temp', JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku,salePrice&searchTerm="+this.$data.result)));
       } catch (e) {
         alert("Er is een fout opgetreden bij het ophalen van data uit de database.");
+      }
+      if (this.$data.temp.elements.length != 0) {
+        Vue.set(vue, 'data', this.$data.temp)
       }
     },
     cheatButton (result,event) {
@@ -58,7 +62,7 @@ var vue = new Vue({
     next (){
       if (this.$data.data.elements.length == 5) {
         Vue.set(vue, 'offset', this.offset + 5);
-        this.getData();
+          this.getData();
       }
     },
     prev (){

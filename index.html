@@ -22,9 +22,6 @@
           <div class="fl w-100">
             <qrcode-reader @capture="onCapture" id="preview">
             </qrcode-reader>
-            <button @click="cheatButton('Weber barbecue')">
-                cheat
-              </button>
           </div>
 
 
@@ -98,7 +95,7 @@
           € {{product.salePrice.value}}
           {{product.salePrice.priceText}}
 
-        </div>  
+        </div>
 
         <button @click="changePage('list')">
             Terug
