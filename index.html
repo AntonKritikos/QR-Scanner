@@ -85,7 +85,9 @@
       <!--Product detail page -->
 
       <section v-if="page == 'product'" class="product_page page" key="product">
-        <img v-bind:src="product.imageLink" alt="">
+        <div class="pdpimg bg-green">
+          <img v-bind:src="product.imageLink" alt="">
+        </div>
         <div class="pdp">
           <div class="productname">
             <h3>{{product.name}}</h3>
@@ -95,6 +97,7 @@
           </div>
           € {{product.salePrice.value}}
           {{product.salePrice.priceText}}
+
         </div>  
 
         <button @click="changePage('list')">

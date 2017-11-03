@@ -102,7 +102,6 @@ body {
 
 .product_page {
   z-index: 40;
-  background-color: lightblue;
 }
 
 .slide-fade-enter-active {
@@ -190,6 +189,10 @@ body {
 
 .listnavbuttons {
   font-size: 30px;
+}
+
+.pdpimg {
+  padding: 30px;
 }
 
 .pdp {
