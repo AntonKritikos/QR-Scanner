@@ -30,33 +30,50 @@ var vue = new Vue({
       Vue.set(vue, 'offset', 0);
       Vue.set(vue, 'result', result);
       this.getData();
-      if (this.$data.data.elements.length == 1) {
-        this.viewProduct(this.$data.data.elements[0].attributes[0].value);
-      }
-      else {
-        this.changePage('list');
+      try {
+        if (this.$data.data.elements.length == 1) {
+          this.viewProduct(this.$data.data.elements[0].attributes[0].value);
+        }
+        else {
+          this.changePage('list');
+        }
+      } catch (e) {
+        this.viewProduct();
       }
 
+
+
     },
-    getData (){
+    getData (dataQuery){
+      if (~this.result.toUpperCase().indexOf("LIST:")) dataQuery = this.result.toUpperCase().replace('LIST:','?amount='+this.amount+'&offset='+this.offset+'&attrs=sku,salePrice&searchTerm=');
+      else if (~this.result.toUpperCase().indexOf("PRODUCT:")) dataQuery = this.result.toUpperCase().replace('PRODUCT:','');
+
       try {
-        Vue.set(vue, 'temp', JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/?amount="+this.$data.amount+"&offset="+this.$data.offset+"&attrs=sku,salePrice&searchTerm="+this.$data.result)));
+        Vue.set(vue, 'temp', JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/"+dataQuery)));
       } catch (e) {
         alert("Er is een fout opgetreden bij het ophalen van data uit de database.");
       }
-      if (this.$data.temp.elements.length != 0) {
-        Vue.set(vue, 'data', this.$data.temp)
+      try {
+        if (this.temp.elements.length != 0) {
+          Vue.set(vue, 'data', this.temp)
+        }
+      } catch (e) {
+        Vue.set(vue, 'product', this.temp)
       }
     },
     cheatButton (result,event) {
       this.onDecode(result);
     },
     changePage (value) {
+      if (value === 'scan') {
+        Vue.set(vue,'data','');
+        Vue.set(vue,'product','');
+      }
       Vue.set(vue, 'page', value)
     },
     viewProduct (id) {
-      Vue.set(vue, 'product',JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/"+id)));
-      Vue.set(vue.product, 'imageLink', this.getImage(id))
+      id = id || this.product.sku;
+      Vue.set(vue.product, 'imageLink', this.getImage(id,'L'))
       this.changePage('product')
     },
     next (){
@@ -71,8 +88,9 @@ var vue = new Vue({
         this.getData();
       }
     },
-    getImage (data){
-      return "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/L/"+data+".jpg";
+    getImage (data,size){
+      size = size || "S"
+      return "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/"+size+"/"+data+".jpg";
     }
   },
   filters: {
