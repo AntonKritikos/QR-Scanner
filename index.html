@@ -97,9 +97,12 @@
 
         </div>
 
-        <button @click="changePage('list')">
-            Terug
-          </button>
+        <button v-if='data' @click="changePage('list')">
+          Terug
+        </button>
+        <button v-else @click="changePage('scan')">
+          Terug
+        </button>
       </section>
 
 

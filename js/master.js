@@ -1,9 +1,9 @@
 // First create a new Vue instance
 var vue = new Vue({
-  el : "#main_page",
+  el : '#main_page',
   data : {
-    page :"scan",
-    data :{},
+    page :'scan',
+    data :'',
     offset : 0,
     amount : 5,
     product : {},
@@ -29,7 +29,7 @@ var vue = new Vue({
     onDecode (result){
       Vue.set(vue, 'offset', 0);
       Vue.set(vue, 'result', result);
-      this.getData();
+      this.getData(this.result);
       try {
         if (this.$data.data.elements.length == 1) {
           this.viewProduct(this.$data.data.elements[0].attributes[0].value);
@@ -45,8 +45,8 @@ var vue = new Vue({
 
     },
     getData (dataQuery){
-      if (~this.result.toUpperCase().indexOf("LIST:")) dataQuery = this.result.toUpperCase().replace('LIST:','?amount='+this.amount+'&offset='+this.offset+'&attrs=sku,salePrice&searchTerm=');
-      else if (~this.result.toUpperCase().indexOf("PRODUCT:")) dataQuery = this.result.toUpperCase().replace('PRODUCT:','');
+      if (~dataQuery.toUpperCase().indexOf("LIST:")) dataQuery = this.result.toUpperCase().replace('LIST:','?amount='+this.amount+'&offset='+this.offset+'&attrs=sku,salePrice&searchTerm=');
+      else if (~dataQuery.toUpperCase().indexOf("PRODUCT:")) dataQuery = this.result.toUpperCase().replace('PRODUCT:','');
 
       try {
         Vue.set(vue, 'temp', JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/"+dataQuery)));
@@ -72,6 +72,9 @@ var vue = new Vue({
       Vue.set(vue, 'page', value)
     },
     viewProduct (id) {
+      if (id) {
+        this.getData(id);
+      }
       id = id || this.product.sku;
       Vue.set(vue.product, 'imageLink', this.getImage(id,'L'))
       this.changePage('product')
