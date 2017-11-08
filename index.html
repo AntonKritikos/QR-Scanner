@@ -54,7 +54,7 @@
 
       <section v-if="page == 'list'" class="list_page page fl w-100" key="list">
         <div class="itemlist">
-          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data.elements" @click="viewProduct(value.attributes[0].value)">
+          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data[offset]" @click="viewProduct(value.attributes[0].value)">
             <div class="picdiv">
               <img v-bind:src="getImage(value.attributes[0].value)" alt="">
             </div>
@@ -97,7 +97,7 @@
 
         </div>
 
-        <button v-if='data' @click="changePage('list')">
+        <button v-if='data.length != 0' @click="changePage('list')">
           Terug
         </button>
         <button v-else @click="changePage('scan')">
