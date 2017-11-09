@@ -56,12 +56,12 @@
         <div class="itemlist">
           <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data[offset]" @click="viewProduct(value.attributes[0].value)">
             <div class="picdiv">
-              <img v-bind:src="getImage(value.attributes[0].value)" alt="">
+              <img v-bind:src="getImage(value.attributes[0].value)" onerror="this.src='./assets/scandog.png'">
             </div>
             <div class="productinfo">
               <p>Naam:{{value.title}}</p>
               <p>Prijs: € {{value.attributes[1].value.value}}</p>
-              <p>Descriptie: {{value.description | limitWords(5)}}</p>
+              <p>Descriptie: {{value.description | limitWords(20)}}</p>
             </div>
           </div>
         </div>

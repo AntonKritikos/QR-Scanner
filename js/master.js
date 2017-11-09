@@ -51,8 +51,8 @@ var vue = new Vue({
     },
     getData(dataQuery) {
 
-      if (~dataQuery.toUpperCase().indexOf("LIST:")) dataQuery = this.result.toUpperCase().replace('LIST:', '?amount=' + this.amount * 5 + '&offset=' + this.offset + '&attrs=sku,salePrice&searchTerm=');
-      else if (~dataQuery.toUpperCase().indexOf("PRODUCT:")) dataQuery = this.result.toUpperCase().replace('PRODUCT:', '');
+      if (~dataQuery.toUpperCase().indexOf("LIST:")) dataQuery = dataQuery.toUpperCase().replace('LIST:', '?amount=' + this.amount * 5 + '&offset=' + this.offset + '&attrs=sku,salePrice&searchTerm=');
+      else if (~dataQuery.toUpperCase().indexOf("PRODUCT:")) dataQuery = dataQuery.toUpperCase().replace('PRODUCT:', '');
 
 
       try {
@@ -68,7 +68,7 @@ var vue = new Vue({
       } catch (e) {
         Vue.set(vue, 'product', this.temp)
       }
-      Vue.set(vue, 'temp', '');
+      // Vue.set(vue, 'temp', '');
     },
     cheatButton(result, event) {
       this.onDecode(result);
@@ -99,22 +99,22 @@ var vue = new Vue({
       }
     },
     getImage(data, size) {
-      size = size || "S"
-      try {
-        return "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
-      } catch (e) {
-        console.log("no-Image");
-      }
-
+      size = size || "S";
+      var img = new Image();
+      img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
+      return img.src
     },
     createPagination() {
       while (this.temp.elements.length > 0)
         this.data.push(this.temp.elements.splice(0, this.amount));
     }
-  },
-  filters: {
 
+  },
+  filters : {
     limitWords(textToLimit, wordLimit) {
+      if (!textToLimit) {
+        return "";
+      }
       var finalText = "";
 
       var text2 = textToLimit.replace(/\s+/g, ' ');
