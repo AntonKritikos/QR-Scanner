@@ -1,18 +1,19 @@
 // First create a new Vue instance
 var vue = new Vue({
-  el: '#main_page',
-  data: {
-    page: 'scan',
-    data: [],
-    offset: 0,
-    amount: 5,
-    product: {},
-    result: '',
-    image: '',
-    temp: '',
-    pagination: ''
+  el : '#main_page',
+  data : {
+    page : 'scan',
+    data : [],
+    offset : 0,
+    amount : 25,
+    product : {},
+    result : '',
+    image : '',
+    temp : {},
+    pagination: 0,
+    maxPages : 5
   },
-  methods: {
+  methods : {
     onCapture(event) {
       if (event === null) {
         // no QR-Code dected since last capture
@@ -30,45 +31,52 @@ var vue = new Vue({
     onDecode(result) {
       Vue.set(vue, 'offset', 0);
       Vue.set(vue, 'result', result);
+      Vue.set(vue, 'pagination', 0);
       try {
-        this.getData(result);
+        a = this.getData(result);
       } catch (e) {
         alert('Something went wrong ');
         location.reload();
       }
-      try {
-        if (this.data[this.offset].length == 1) {
-          this.viewProduct(this.data[this.offset].attributes[0].value);
+      if (a == 'list') {
+        if (this.data[this.pagination].length == 1) {
+          this.viewProduct(this.data[this.pagination].attributes[0].value);
         } else {
           this.changePage('list');
         }
-      } catch (e) {
+      }
+      else if (a == 'product') {
         if (this.product != '') {
           this.viewProduct();
 
-        } else {}
+        }
       }
+      return a
     },
     getData(dataQuery) {
 
-      if (~dataQuery.toUpperCase().indexOf("LIST:")) dataQuery = dataQuery.toUpperCase().replace('LIST:', '?amount=' + this.amount * 5 + '&offset=' + this.offset + '&attrs=sku,salePrice&searchTerm=');
+      if (~dataQuery.toUpperCase().indexOf("LIST:")) dataQuery = dataQuery.toUpperCase().replace('LIST:', '?amount=' + this.amount + '&offset=' + this.offset + '&attrs=sku,salePrice,image&searchTerm=');
       else if (~dataQuery.toUpperCase().indexOf("PRODUCT:")) dataQuery = dataQuery.toUpperCase().replace('PRODUCT:', '');
 
 
       try {
-        Vue.set(vue, 'temp', JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/" + dataQuery)));
+        // Sellsmart Server
+        // Vue.set(vue, 'temp', JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/" + dataQuery)));
+
+        // JX Demo Server
+        Vue.set(vue, 'temp', JSON.parse(this.getJson("http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/inSPIRED-inTRONICS-Site/-/products/" + dataQuery)));
       } catch (e) {
         alert("Er is een fout opgetreden bij het ophalen van data uit de database.");
       }
-      try {
-        if (this.temp.elements.length != 0) {
-          // Vue.set(vue, 'data', this.temp)
-          this.createPagination();
-        }
-      } catch (e) {
-        Vue.set(vue, 'product', this.temp)
+      if ('elements' in this.temp && this.temp.elements.length != 0) {
+        this.createPagination();
+        return 'list'
       }
-      // Vue.set(vue, 'temp', '');
+      else if ('attributes' in this.temp) {
+        Vue.set(vue, 'product', this.temp);
+        return 'product'
+      }
+      // Vue.set(vue, 'temp', {});
     },
     cheatButton(result, event) {
       this.onDecode(result);
@@ -76,7 +84,7 @@ var vue = new Vue({
     changePage(value) {
       if (value === 'scan') {
         Vue.set(vue, 'data', []);
-        Vue.set(vue, 'product', '');
+        Vue.set(vue, 'product', {});
       }
       Vue.set(vue, 'page', value)
     },
@@ -89,24 +97,42 @@ var vue = new Vue({
       this.changePage('product')
     },
     next() {
-      if (this.offset < this.data.length - 1) {
-        Vue.set(vue, 'offset', this.offset + 1);
+      if (this.pagination < this.data.length - 1) {
+        Vue.set(vue, 'pagination', this.pagination + 1);
+      }
+      else if (this.pagination == this.data.length - 1 && this.data[this.pagination].length == this.amount / this.maxPages) {
+        Vue.set(vue, 'offset', this.offset + this.amount);
+        Vue.set(vue, 'pagination', 0);
+        this.getData(this.result);
       }
     },
     prev() {
-      if (this.offset > 0) {
-        Vue.set(vue, 'offset', this.offset - 1);
+      if (this.pagination > 0) {
+        Vue.set(vue, 'pagination', this.pagination - 1);
+      }
+      else if (this.pagination == 0 && this.offset != 0) {
+        Vue.set(vue, 'offset', this.offset - this.amount);
+        Vue.set(vue, 'pagination', 0);
+        this.getData(this.result);
       }
     },
-    getImage(data, size) {
+    getImage(data, index, size) {
       size = size || "S";
-      var img = new Image();
-      img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
-      return img.src
+      if (this.data[this.pagination][index].attributes[1].value) {
+        var img = new Image();
+        img.src = "http://jxdemoserver.intershop.de" + this.data[this.pagination][index].attributes[1].value;
+        return img.src
+      }
+      else {
+        var img = new Image();
+        img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
+        return img.src
+      }
     },
     createPagination() {
+      Vue.set(vue, 'data', []);
       while (this.temp.elements.length > 0)
-        this.data.push(this.temp.elements.splice(0, this.amount));
+        this.data.push(this.temp.elements.splice(0, this.amount / this.maxPages));
     }
 
   },

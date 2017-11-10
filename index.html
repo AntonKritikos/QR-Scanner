@@ -14,8 +14,11 @@
 <body>
 
   <div id="main_page">
-    <!--Scan page-->
     <transition name="slide-fade" mode="in-out">
+      <!-- Loading screen -->
+      <!-- <section v-if="loading" class="loading page" key="loading">
+      </section> -->
+      <!--Scan page-->
       <section v-if="page == 'scan'" class="scan_page page" key="scan">
         <div class="wrapper">
 
@@ -54,13 +57,13 @@
 
       <section v-if="page == 'list'" class="list_page page fl w-100" key="list">
         <div class="itemlist">
-          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data[offset]" @click="viewProduct(value.attributes[0].value)">
+          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data[pagination]" @click="viewProduct(value.attributes[0].value)">
             <div class="picdiv">
-              <img v-bind:src="getImage(value.attributes[0].value)" onerror="this.src='./assets/scandog.png'">
+              <img v-bind:src="getImage(value.attributes[0].value, index)" onerror="this.src='./assets/scandog.png'"/>
             </div>
             <div class="productinfo">
               <p>Naam:{{value.title}}</p>
-              <p>Prijs: € {{value.attributes[1].value.value}}</p>
+              <p>Prijs: € {{value.attributes[2].value.value}}</p>
               <p>Descriptie: {{value.description | limitWords(20)}}</p>
             </div>
           </div>
@@ -83,7 +86,7 @@
 
       <section v-if="page == 'product'" class="product_page page" key="product">
         <div class="pdpimg bg-green">
-          <img v-bind:src="product.imageLink" alt="">
+          <img v-bind:src="product.imageLink" alt=""/>
         </div>
         <div class="pdp">
           <div class="productname">
@@ -114,6 +117,9 @@
   </div>
 
   <link rel="stylesheet" href="vue-qrcode-reader/dist/vue-qrcode-reader.css" />
+  <script type="text/javascript" src="node_modules/jquery/dist/jquery.js">
+
+  </script>
   <script src="js/vue.js"></script>
   <script src="vue-qrcode-reader/dist/vue-qrcode-reader.browser.js"></script>
   <script src="js/master.js"></script>
