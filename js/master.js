@@ -93,7 +93,7 @@ var vue = new Vue({
         this.getData(id);
       }
       id = id || this.product.sku;
-      Vue.set(vue.product, 'imageLink', this.getImage(id, 'L'))
+      // Vue.set(vue.product, 'imageLink', this.getImage(id, 'L'))
       this.changePage('product')
     },
     next() {
@@ -112,22 +112,16 @@ var vue = new Vue({
       }
       else if (this.pagination == 0 && this.offset != 0) {
         Vue.set(vue, 'offset', this.offset - this.amount);
-        Vue.set(vue, 'pagination', 0);
+        Vue.set(vue, 'pagination', this.maxPages - 1);
         this.getData(this.result);
       }
     },
     getImage(data, index, size) {
       size = size || "S";
-      if (this.data[this.pagination][index].attributes[1].value) {
-        var img = new Image();
-        img.src = "http://jxdemoserver.intershop.de" + this.data[this.pagination][index].attributes[1].value;
-        return img.src
-      }
-      else {
-        var img = new Image();
-        img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
-        return img.src
-      }
+        // var img = new Image();
+        // img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
+        // return img.src
+
     },
     createPagination() {
       Vue.set(vue, 'data', []);

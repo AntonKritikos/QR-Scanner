@@ -102,6 +102,7 @@ body {
 
 .product_page {
   z-index: 40;
+  background-color: white;
 }
 
 .slide-fade-enter-active {
