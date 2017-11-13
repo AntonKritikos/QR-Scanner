@@ -51,7 +51,7 @@ var vue = new Vue({
 
         }
       }
-      return a
+      return true
     },
     getData(dataQuery) {
 
@@ -93,7 +93,7 @@ var vue = new Vue({
         this.getData(id);
       }
       id = id || this.product.sku;
-      // Vue.set(vue.product, 'imageLink', this.getImage(id, 'L'))
+      Vue.set(vue.product, 'imageLink', this.getImage(id, 'L'))
       this.changePage('product')
     },
     next() {
@@ -118,9 +118,10 @@ var vue = new Vue({
     },
     getImage(data, index, size) {
       size = size || "S";
-        // var img = new Image();
+        var img = new Image();
         // img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
-        // return img.src
+        img.src = './assets/icon-no-image.png';
+        return img.src
 
     },
     createPagination() {
