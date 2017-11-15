@@ -11,7 +11,8 @@ var vue = new Vue({
     image : '',
     temp : {},
     pagination: 0,
-    maxPages : 5
+    maxPages : 5,
+    basket : ''
   },
   methods : {
     onCapture(event) {
@@ -22,11 +23,38 @@ var vue = new Vue({
         event.points // array of QR-Code module positions
       }
     },
-    getJson(yourUrl) {
+    getJson(yourUrl, auth) {
       var Httpreq = new XMLHttpRequest(); // a new request
       Httpreq.open("GET", yourUrl, false);
+      if (auth) Httpreq.setRequestHeader('authentication-token', auth);
       Httpreq.send(null);
       return Httpreq.responseText;
+    },
+    postJson(yourUrl, data, auth) {
+      data = data || null;
+      var Httpreq = new XMLHttpRequest(); // a new request
+      Httpreq.open("POST", yourUrl, false);
+      if (auth)Httpreq.setRequestHeader('authentication-token', auth);
+      Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      Httpreq.send(JSON.stringify(data));
+      if (!data) {
+        return {data : JSON.parse(Httpreq.responseText), auth : Httpreq.getResponseHeader('authentication-token')};
+      }
+    },
+    requestJson(type, Url, auth, data){
+      var Httpreq = new XMLHttpRequest(); // a new request
+      Httpreq.open(type, Url, false);
+      if (type == 'POST' && data) {
+        Httpreq.setRequestHeader('authentication-token', auth);
+        Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      }
+      Httpreq.send(JSON.stringify(data));
+      if (!auth) {
+        return {data : JSON.parse(Httpreq.responseText), auth : Httpreq.getResponseHeader('authentication-token')};
+      }
+      else {
+        return Httpreq.responseText;
+      }
     },
     onDecode(result) {
       Vue.set(vue, 'offset', 0);
@@ -60,11 +88,7 @@ var vue = new Vue({
 
 
       try {
-        // Sellsmart Server
-        // Vue.set(vue, 'temp', JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/products/" + dataQuery)));
-
-        // JX Demo Server
-        Vue.set(vue, 'temp', JSON.parse(this.getJson("http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/inSPIRED-inTRONICS-Site/-/products/" + dataQuery)));
+        Vue.set(vue, 'temp', this.getData(this.createUrl('products/'+dataQuery)));
       } catch (e) {
         alert("Er is een fout opgetreden bij het ophalen van data uit de database.");
       }
@@ -128,8 +152,44 @@ var vue = new Vue({
       Vue.set(vue, 'data', []);
       while (this.temp.elements.length > 0)
         this.data.push(this.temp.elements.splice(0, this.amount / this.maxPages));
-    }
+    },
+    createUrl(dataQuery) {
+      // Sellsmart Server
+      // return JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery));
 
+      // JX Demo Server
+      return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/inSPIRED-inTRONICS-Site/-/" + dataQuery;
+    },
+    manageBasket(nav) {
+      nav = nav || '';
+      if (!this.getCookie('authentication-token')) {
+        a = this.requestJson('POST',this.createUrl('baskets'));
+        Vue.set(vue, 'basket', a.data);
+        document.cookie = "authentication-token="+a.auth;
+        document.cookie = "basket-id="+a.data.title;
+      }
+      else {
+        url = 'baskets/' + this.getCookie('basket-id') + nav
+        console.log(url);
+        return JSON.parse(this.getJson(this.createUrl(url), this.getCookie('authentication-token')))
+        console.log(1);
+      }
+    },
+    getCookie(cname) {
+      var name = cname + "=";
+      var decodedCookie = decodeURIComponent(document.cookie);
+      var ca = decodedCookie.split(';');
+      for(var i = 0; i <ca.length; i++) {
+          var c = ca[i];
+          while (c.charAt(0) == ' ') {
+              c = c.substring(1);
+          }
+          if (c.indexOf(name) == 0) {
+              return c.substring(name.length, c.length);
+          }
+      }
+      return "";
+    }
   },
   filters : {
     limitWords(textToLimit, wordLimit) {
