@@ -23,15 +23,16 @@ var vue = new Vue({
         event.points // array of QR-Code module positions
       }
     },
-    requestJson(type, Url, auth, data){
+    requestJson(type, Url, reqAuth, data){
+      reqAuth = reqAuth || false;
       var Httpreq = new XMLHttpRequest(); // a new request
       Httpreq.open(type, Url, false);
-      if (type == 'POST' && data) {
-        Httpreq.setRequestHeader('authentication-token', auth);
+      if (reqAuth) {
+        Httpreq.setRequestHeader('authentication-token', this.getCookie('authentication-token'));
         Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       }
       Httpreq.send(JSON.stringify(data));
-      if (!auth) {
+      if (!this.getCookie('authentication-token')) {
         return {data : JSON.parse(Httpreq.responseText), auth : Httpreq.getResponseHeader('authentication-token')};
       }
       else {
@@ -70,7 +71,7 @@ var vue = new Vue({
 
 
       try {
-        Vue.set(vue, 'temp', this.getData(this.createUrl('products/'+dataQuery)));
+        Vue.set(vue, 'temp', this.requestJson('GET',this.createUrl('products/'+dataQuery)));
       } catch (e) {
         alert("Er is een fout opgetreden bij het ophalen van data uit de database.");
       }
