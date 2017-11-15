@@ -23,24 +23,6 @@ var vue = new Vue({
         event.points // array of QR-Code module positions
       }
     },
-    getJson(yourUrl, auth) {
-      var Httpreq = new XMLHttpRequest(); // a new request
-      Httpreq.open("GET", yourUrl, false);
-      if (auth) Httpreq.setRequestHeader('authentication-token', auth);
-      Httpreq.send(null);
-      return Httpreq.responseText;
-    },
-    postJson(yourUrl, data, auth) {
-      data = data || null;
-      var Httpreq = new XMLHttpRequest(); // a new request
-      Httpreq.open("POST", yourUrl, false);
-      if (auth)Httpreq.setRequestHeader('authentication-token', auth);
-      Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      Httpreq.send(JSON.stringify(data));
-      if (!data) {
-        return {data : JSON.parse(Httpreq.responseText), auth : Httpreq.getResponseHeader('authentication-token')};
-      }
-    },
     requestJson(type, Url, auth, data){
       var Httpreq = new XMLHttpRequest(); // a new request
       Httpreq.open(type, Url, false);
