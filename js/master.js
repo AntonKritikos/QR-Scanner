@@ -1,20 +1,20 @@
 // First create a new Vue instance
 var vue = new Vue({
-  el : '#main_page',
-  data : {
-    page : 'scan',
-    data : [],
-    offset : 0,
-    amount : 25,
-    product : {},
-    result : '',
-    image : '',
-    temp : {},
+  el: '#main_page',
+  data: {
+    page: 'scan',
+    data: [],
+    offset: 0,
+    amount: 25,
+    product: {},
+    result: '',
+    image: '',
+    temp: {},
     pagination: 0,
-    maxPages : 5,
-    basket : {}
+    maxPages: 5,
+    basket: {}
   },
-  methods : {
+  methods: {
     onCapture(event) {
       if (event === null) {
         // no QR-Code dected since last capture
@@ -23,7 +23,7 @@ var vue = new Vue({
         event.points // array of QR-Code module positions
       }
     },
-    requestJson(type, Url, reqAuth, data){
+    requestJson(type, Url, reqAuth, data) {
       reqAuth = reqAuth || false;
       var Httpreq = new XMLHttpRequest(); // a new request
       Httpreq.open(type, Url, false);
@@ -33,36 +33,29 @@ var vue = new Vue({
       Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       Httpreq.send(JSON.stringify(data));
       if (!this.getCookie('authentication-token')) {
-        return {data : JSON.parse(Httpreq.responseText), auth : Httpreq.getResponseHeader('authentication-token')};
+
+
+       this.setCookie('authentication-token', Httpreq.getResponseHeader('authentication-token'));
+       this.setCookie('basket-id', Httpreq.responseText.title);
       }
-      else {
-        return Httpreq.responseText;
-      }
+      return JSON.parse(Httpreq.responseText);
     },
     onDecode(result) {
       Vue.set(vue, 'offset', 0);
       Vue.set(vue, 'result', result);
       Vue.set(vue, 'pagination', 0);
       try {
-        a = this.getData(result);
+        var a = this.getData(result);
       } catch (e) {
-        alert('Something went wrong ');
-        location.reload();
+        alert(e);
+        // location.reload();
       }
-      if (a == 'list') {
-        if (this.data[this.pagination].length == 1) {
-          this.viewProduct(this.data[this.pagination].attributes[0].value);
-        } else {
-          this.changePage('list');
-        }
+      if (a) {
+        return true
       }
-      else if (a == 'product') {
-        if (this.product != '') {
-          this.viewProduct();
-
-        }
+      else {
+        return false
       }
-      return true
     },
     getData(dataQuery) {
 
@@ -71,19 +64,28 @@ var vue = new Vue({
 
 
       try {
-        Vue.set(vue, 'temp', this.requestJson('GET',this.createUrl('products/'+dataQuery)));
+        Vue.set(vue, 'temp', this.requestJson('GET', this.createUrl('products/' + dataQuery)));
       } catch (e) {
-        alert("Er is een fout opgetreden bij het ophalen van data uit de database.");
+        alert(e);
       }
       if ('elements' in this.temp && this.temp.elements.length != 0) {
-        this.createPagination();
-        return 'list'
-      }
-      else if ('attributes' in this.temp) {
+        if (this.temp.elements.length == 1) {
+          this.viewProduct(this.temp.elements[0].attributes[0].value);
+        } else {
+          this.createPagination(this.temp.elements ,'data');
+          this.changePage('list');
+        }
+      } else if ('attributes' in this.temp) {
         Vue.set(vue, 'product', this.temp);
-        return 'product'
+        if (this.product != '') {
+          this.viewProduct();
+        }
       }
-      // Vue.set(vue, 'temp', {});
+      else {
+        return false
+      }
+      Vue.set(vue, 'temp', {});
+      return true
     },
     cheatButton(result, event) {
       this.onDecode(result);
@@ -106,8 +108,7 @@ var vue = new Vue({
     next() {
       if (this.pagination < this.data.length - 1) {
         Vue.set(vue, 'pagination', this.pagination + 1);
-      }
-      else if (this.pagination == this.data.length - 1 && this.data[this.pagination].length == this.amount / this.maxPages) {
+      } else if (this.pagination == this.data.length - 1 && this.data[this.pagination].length == this.amount / this.maxPages) {
         Vue.set(vue, 'offset', this.offset + this.amount);
         Vue.set(vue, 'pagination', 0);
         this.getData(this.result);
@@ -116,8 +117,7 @@ var vue = new Vue({
     prev() {
       if (this.pagination > 0) {
         Vue.set(vue, 'pagination', this.pagination - 1);
-      }
-      else if (this.pagination == 0 && this.offset != 0) {
+      } else if (this.pagination == 0 && this.offset != 0) {
         Vue.set(vue, 'offset', this.offset - this.amount);
         Vue.set(vue, 'pagination', this.maxPages - 1);
         this.getData(this.result);
@@ -125,78 +125,83 @@ var vue = new Vue({
     },
     getImage(data, index, size) {
       size = size || "S";
-        var img = new Image();
-        // img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
-        img.src = './assets/icon-no-image.png';
-        return img.src
+      var img = new Image();
+      // img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
+      img.src = './assets/icon-no-image.png';
+      return img.src
 
     },
-    createPagination() {
-      Vue.set(vue, 'data', []);
-      while (this.temp.elements.length > 0)
-        this.data.push(this.temp.elements.splice(0, this.amount / this.maxPages));
+    createPagination(content, target) {
+      Vue.set(vue, target, []);
+      a = [];
+      while (content.length > 0)
+        a.push(content.splice(0, this.amount / this.maxPages));
+      Vue.set(vue, target, a);
     },
     createUrl(dataQuery) {
       // Sellsmart Server
-      // return JSON.parse(this.getJson("https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery));
+      // return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
 
       // JX Demo Server
       return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/inSPIRED-inTRONICS-Site/-/" + dataQuery;
     },
     manageBasket(nav) {
-      nav = nav || '';
       if (!this.getCookie('authentication-token')) {
-        a = this.requestJson('POST',this.createUrl('baskets'));
-        Vue.set(vue, 'basket', a.data);
-        this.setCookie('authentication-token',a.auth);
-        this.setCookie('basket-id',a.data.title);
-      }
-      else {
-        url = 'baskets/' + this.getCookie('basket-id') + nav
+        a = this.requestJson('POST', this.createUrl('baskets'));
+        Vue.set(vue, 'basket', a);
+      } else {
+        url = 'baskets/' + this.getCookie('basket-id')
         console.log(url);
-        return JSON.parse(this.requestJson('GET',this.createUrl(url), this.getCookie('authentication-token')))
+        return this.requestJson('GET', this.createUrl(url), this.getCookie('authentication-token'))
         console.log(1);
       }
     },
-    setCookie(name,data,hours){
-      hours = hours || 5;
+    setCookie(name, data, hours) {
+      hours = hours || 0.5;
       var date = new Date();
-      date.setTime(date.getTime()+(hours*60*60*1000));
-      document.cookie = name+"="+data+"; expires="+date.toGMTString();
+      date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
+      document.cookie = name + "=" + data + "; expires=" + date.toGMTString();
     },
     getCookie(cname) {
       var name = cname + "=";
       var decodedCookie = decodeURIComponent(document.cookie);
       var ca = decodedCookie.split(';');
-      for(var i = 0; i <ca.length; i++) {
-          var c = ca[i];
-          while (c.charAt(0) == ' ') {
-              c = c.substring(1);
-          }
-          if (c.indexOf(name) == 0) {
-              return c.substring(name.length, c.length);
-          }
+      for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+          return c.substring(name.length, c.length);
+        }
       }
       return "";
     },
-    addToBasket(id, quantity){
-      data = {elements : [{'sku':id,'quantity':{'value':quantity}}]}
-      a = this.requestJson('POST', this.createUrl('baskets/'+this.getCookie('basket-id')+'/items'), true, data);
+    addToBasket(id, quantity) {
+      data = {
+        elements: [{
+          'sku': id,
+          'quantity': {
+            'value': quantity
+          }
+        }]
+      }
+      a = this.requestJson('POST', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true, data);
       return a;
     },
-    getBasket(){
-      a = this.requestJson('GET', this.createUrl('baskets/'+this.getCookie('basket-id')+'/items'), true);
-      data = JSON.parse(a);
-      Vue.set(vue,'basket',data.elements);
+    getBasket() {
+      a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true);
+      data = a;
+      Vue.set(vue, 'basket', data.elements);
       this.changePage('basket');
       return data;
     },
-    removeFromBasket(id,quantity){
-      a = this.requestJson('DELETE', this.createUrl('baskets/'+this.getCookie('basket-id')+'/items'+id), true);
+    removeFromBasket(id, quantity) {
+      a = this.requestJson('DELETE', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items' + id), true);
       return a;
     }
   },
-  filters : {
+  filters: {
     limitWords(textToLimit, wordLimit) {
       if (!textToLimit) {
         return "";

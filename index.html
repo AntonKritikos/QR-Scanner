@@ -117,8 +117,11 @@
       <section v-if="page == 'basket'" class="basket_page page fl w-100" key="basket">
         <div class="itemlist">
           <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in basket" >
+            <div class="picdiv">
+              <img v-bind:src="getImage(value.product.title, index)" onerror="this.src='./assets/scandog.png'"/>
+            </div>
             {{value.name}}
-            {{value.quantity.value}}          
+            {{value.quantity.value}}
           </div>
         </div>
         <div class="listnav bg-green">
