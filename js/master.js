@@ -12,7 +12,7 @@ var vue = new Vue({
     temp : {},
     pagination: 0,
     maxPages : 5,
-    basket : ''
+    basket : {}
   },
   methods : {
     onCapture(event) {
@@ -29,8 +29,8 @@ var vue = new Vue({
       Httpreq.open(type, Url, false);
       if (reqAuth) {
         Httpreq.setRequestHeader('authentication-token', this.getCookie('authentication-token'));
-        Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       }
+      Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       Httpreq.send(JSON.stringify(data));
       if (!this.getCookie('authentication-token')) {
         return {data : JSON.parse(Httpreq.responseText), auth : Httpreq.getResponseHeader('authentication-token')};
@@ -148,15 +148,21 @@ var vue = new Vue({
       if (!this.getCookie('authentication-token')) {
         a = this.requestJson('POST',this.createUrl('baskets'));
         Vue.set(vue, 'basket', a.data);
-        document.cookie = "authentication-token="+a.auth;
-        document.cookie = "basket-id="+a.data.title;
+        this.setCookie('authentication-token',a.auth);
+        this.setCookie('basket-id',a.data.title);
       }
       else {
         url = 'baskets/' + this.getCookie('basket-id') + nav
         console.log(url);
-        return JSON.parse(this.getJson(this.createUrl(url), this.getCookie('authentication-token')))
+        return JSON.parse(this.requestJson('GET',this.createUrl(url), this.getCookie('authentication-token')))
         console.log(1);
       }
+    },
+    setCookie(name,data,hours){
+      hours = hours || 5;
+      var date = new Date();
+      date.setTime(date.getTime()+(hours*60*60*1000));
+      document.cookie = name+"="+data+"; expires="+date.toGMTString();
     },
     getCookie(cname) {
       var name = cname + "=";
@@ -172,6 +178,22 @@ var vue = new Vue({
           }
       }
       return "";
+    },
+    addToBasket(id, quantity){
+      data = {elements : [{'sku':id,'quantity':{'value':quantity}}]}
+      a = this.requestJson('POST', this.createUrl('baskets/'+this.getCookie('basket-id')+'/items'), true, data);
+      return a;
+    },
+    getBasket(){
+      a = this.requestJson('GET', this.createUrl('baskets/'+this.getCookie('basket-id')+'/items'), true);
+      data = JSON.parse(a);
+      Vue.set(vue,'basket',data.elements);
+      this.changePage('basket');
+      return data;
+    },
+    removeFromBasket(id,quantity){
+      a = this.requestJson('DELETE', this.createUrl('baskets/'+this.getCookie('basket-id')+'/items'+id), true);
+      return a;
     }
   },
   filters : {

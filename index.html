@@ -98,11 +98,14 @@
           € {{product.salePrice.value}}
           {{product.salePrice.priceText}}
           <button type="button" name="button">Koop</button>
-          
+
 
         </div>
 
         <button v-if='data.length != 0' @click="changePage('list')">
+          Terug
+        </button>
+        <button v-else-if='basket.length != 0' @click="changePage('basket')">
           Terug
         </button>
         <button v-else @click="changePage('scan')">
@@ -110,7 +113,24 @@
         </button>
       </section>
 
-
+      <!-- Basket page -->
+      <section v-if="page == 'basket'" class="basket_page page fl w-100" key="basket">
+        <div class="itemlist">
+          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in basket" >
+            {{value.name}}
+            {{value.quantity.value}}          
+          </div>
+        </div>
+        <div class="listnav bg-green">
+          <span @click="prev()" class="ti-angle-double-left listnavbuttons"></span>
+          <span @click="next()" class="ti-angle-double-right listnavbuttons fr"></span>
+          <div class="tc">
+            <button @click="changePage('scan')" class="backbtn bg-light-green">
+              Terug
+            </button>
+          </div>
+        </div>
+      </section>
 
     </transition>
     <div v-if="page" class="footer bg-light-green tc">
