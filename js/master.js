@@ -25,6 +25,7 @@ var vue = new Vue({
     },
     requestJson(type, Url, reqAuth, data) {
       reqAuth = reqAuth || false;
+      data = data || null
       var Httpreq = new XMLHttpRequest(); // a new request
       Httpreq.open(type, Url, false);
       if (reqAuth) {
@@ -33,10 +34,8 @@ var vue = new Vue({
       Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       Httpreq.send(JSON.stringify(data));
       if (!this.getCookie('authentication-token')) {
-
-
        this.setCookie('authentication-token', Httpreq.getResponseHeader('authentication-token'));
-       this.setCookie('basket-id', Httpreq.responseText.title);
+       this.setCookie('basket-id', (JSON.parse(Httpreq.responseText)).title );
       }
       return JSON.parse(Httpreq.responseText);
     },
@@ -75,7 +74,7 @@ var vue = new Vue({
           this.createPagination(this.temp.elements ,'data');
           this.changePage('list');
         }
-      } else if ('attributes' in this.temp) {
+      } else if ('sku' in this.temp) {
         Vue.set(vue, 'product', this.temp);
         if (this.product != '') {
           this.viewProduct();
@@ -140,26 +139,15 @@ var vue = new Vue({
     },
     createUrl(dataQuery) {
       // Sellsmart Server
-      // return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
+      return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
 
       // JX Demo Server
       return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/inSPIRED-inTRONICS-Site/-/" + dataQuery;
     },
-    manageBasket(nav) {
-      if (!this.getCookie('authentication-token')) {
-        a = this.requestJson('POST', this.createUrl('baskets'));
-        Vue.set(vue, 'basket', a);
-      } else {
-        url = 'baskets/' + this.getCookie('basket-id')
-        console.log(url);
-        return this.requestJson('GET', this.createUrl(url), this.getCookie('authentication-token'))
-        console.log(1);
-      }
-    },
-    setCookie(name, data, hours) {
-      hours = hours || 0.5;
+    setCookie(name, data, minutes) {
+      minutes = minutes || 30;
       var date = new Date();
-      date.setTime(date.getTime() + (hours * 60 * 60 * 1000));
+      date.setTime(date.getTime() + (minutes * 60 * 1000));
       document.cookie = name + "=" + data + "; expires=" + date.toGMTString();
     },
     getCookie(cname) {
@@ -177,7 +165,14 @@ var vue = new Vue({
       }
       return "";
     },
+    createBasket(nav) {
+      if (!this.getCookie('authentication-token')) {
+        a = this.requestJson('POST', this.createUrl('baskets'));
+        Vue.set(vue, 'basket', a);
+      }
+    },
     addToBasket(id, quantity) {
+      quantity = quantity || 1
       data = {
         elements: [{
           'sku': id,
@@ -196,8 +191,15 @@ var vue = new Vue({
       this.changePage('basket');
       return data;
     },
-    removeFromBasket(id, quantity) {
-      a = this.requestJson('DELETE', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items' + id), true);
+    removeFromBasket(id) {
+      console.log(id);
+      try {
+        a = this.requestJson('DELETE', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + id), true);
+
+      } catch (e) {
+
+      }
+      this.getBasket();
       return a;
     }
   },

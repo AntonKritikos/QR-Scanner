@@ -97,7 +97,7 @@
           </div>
           € {{product.salePrice.value}}
           {{product.salePrice.priceText}}
-          <button type="button" name="button">Koop</button>
+          <button type="button" name="button" @click='addToBasket(product.sku)'>Koop</button>
 
 
         </div>
@@ -120,8 +120,9 @@
             <div class="picdiv">
               <img v-bind:src="getImage(value.product.title, index)" onerror="this.src='./assets/scandog.png'"/>
             </div>
-            {{value.name}}
-            {{value.quantity.value}}
+            {{value.name}}<br>
+            {{value.quantity.value}}<br>
+            <button type="button" name="button" @click='removeFromBasket(value.id)'>verwijder</button>
           </div>
         </div>
         <div class="listnav bg-green">
