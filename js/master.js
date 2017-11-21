@@ -1,6 +1,6 @@
 // First create a new Vue instance
 var vue = new Vue({
-  el: '#main_page',
+  el: '#app-root',
   data: {
     page: 'scan',
     data: [],
@@ -8,7 +8,6 @@ var vue = new Vue({
     amount: 25,
     product: {},
     result: '',
-    image: '',
     temp: {},
     pagination: 0,
     maxPages: 5,
@@ -139,7 +138,7 @@ var vue = new Vue({
     },
     createUrl(dataQuery) {
       // Sellsmart Server
-      return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
+      // return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
 
       // JX Demo Server
       return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/inSPIRED-inTRONICS-Site/-/" + dataQuery;
@@ -165,7 +164,7 @@ var vue = new Vue({
       }
       return "";
     },
-    createBasket(nav) {
+    createBasket() {
       if (!this.getCookie('authentication-token')) {
         a = this.requestJson('POST', this.createUrl('baskets'));
         Vue.set(vue, 'basket', a);

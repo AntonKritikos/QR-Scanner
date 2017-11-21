@@ -13,7 +13,7 @@
 
 <body>
 
-  <div id="main_page">
+  <div id="app-root">
     <transition name="slide-fade" mode="in-out">
       <!-- Loading screen -->
       <!-- <section v-if="loading" class="loading page" key="loading">
@@ -59,7 +59,7 @@
         <div class="itemlist">
           <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data[pagination]" @click="viewProduct(value.attributes[0].value)">
             <div class="picdiv">
-              <img v-bind:src="getImage(value.attributes[0].value, index)" onerror="this.src='./assets/scandog.png'"/>
+              <img v-bind:src="getImage(value.attributes[0].value, index)" onerror="this.src='./assets/scandog.png'" />
             </div>
             <div class="productinfo">
               <p>Naam:{{value.title}}</p>
@@ -86,7 +86,7 @@
 
       <section v-if="page == 'product'" class="product_page page" key="product">
         <div class="pdpimg bg-green">
-          <img v-bind:src="product.imageLink" alt=""/>
+          <img v-bind:src="product.imageLink" alt="" />
         </div>
         <div class="pdp">
           <div class="productname">
@@ -95,9 +95,11 @@
           <div class="productdescription">
             <p>{{product.longDescription}}</p>
           </div>
-          € {{product.salePrice.value}}
-          {{product.salePrice.priceText}}
-          <button type="button" name="button" @click='addToBasket(product.sku)'>Koop</button>
+          € {{product.salePrice.value}} {{product.salePrice.priceText}}
+          <div>
+            <counter prop-name="counter" ></counter>
+            <button type="button" name="button" @click='addToBasket(product.sku, $children[0].counter)'>Koop</button>
+          </div>
 
 
         </div>
@@ -116,12 +118,12 @@
       <!-- Basket page -->
       <section v-if="page == 'basket'" class="basket_page page fl w-100" key="basket">
         <div class="itemlist">
-          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in basket" >
+          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in basket">
             <div class="picdiv">
-              <img v-bind:src="getImage(value.product.title, index)" onerror="this.src='./assets/scandog.png'"/>
+              <img v-bind:src="getImage(value.product.title, index)" onerror="this.src='./assets/scandog.png'" />
             </div>
-            {{value.name}}<br>
-            {{value.quantity.value}}<br>
+            {{value.name}}<br> {{value.quantity.value}}
+            <br>
             <button type="button" name="button" @click='removeFromBasket(value.id)'>verwijder</button>
           </div>
         </div>
@@ -143,11 +145,9 @@
   </div>
 
   <link rel="stylesheet" href="vue-qrcode-reader/dist/vue-qrcode-reader.css" />
-  <script type="text/javascript" src="node_modules/jquery/dist/jquery.js">
-
-  </script>
   <script src="js/vue.js"></script>
   <script src="vue-qrcode-reader/dist/vue-qrcode-reader.browser.js"></script>
+  <script src="js/components.js"></script>
   <script src="js/master.js"></script>
 </body>
 
