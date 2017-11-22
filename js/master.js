@@ -1,6 +1,7 @@
-// First create a new Vue instance
 var vue = new Vue({
+
   el: '#app-root',
+
   data: {
     page: 'scan',
     data: [],
@@ -11,33 +12,41 @@ var vue = new Vue({
     temp: {},
     pagination: 0,
     maxPages: 5,
-    basket: {}
+    basket: {},
+    loading: false
   },
+
   methods: {
+
     onCapture(event) {
       if (event === null) {
-        // no QR-Code dected since last capture
+
       } else {
         this.onDecode(event.result);
-        event.points // array of QR-Code module positions
       }
     },
+
     requestJson(type, Url, reqAuth, data) {
       reqAuth = reqAuth || false;
       data = data || null
-      var Httpreq = new XMLHttpRequest(); // a new request
-      Httpreq.open(type, Url, false);
+      var Httpreq = new XMLHttpRequest();
+      try {
+        Httpreq.open(type, Url, false);
+      } catch (e) {
+        console.log(e);
+      }
       if (reqAuth) {
         Httpreq.setRequestHeader('authentication-token', this.getCookie('authentication-token'));
       }
       Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
       Httpreq.send(JSON.stringify(data));
       if (!this.getCookie('authentication-token')) {
-       this.setCookie('authentication-token', Httpreq.getResponseHeader('authentication-token'));
-       this.setCookie('basket-id', (JSON.parse(Httpreq.responseText)).title );
+        this.setCookie('authentication-token', Httpreq.getResponseHeader('authentication-token'));
+        this.setCookie('basket-id', (JSON.parse(Httpreq.responseText)).title);
       }
       return JSON.parse(Httpreq.responseText);
     },
+
     onDecode(result) {
       Vue.set(vue, 'offset', 0);
       Vue.set(vue, 'result', result);
@@ -46,21 +55,18 @@ var vue = new Vue({
         var a = this.getData(result);
       } catch (e) {
         alert(e);
-        // location.reload();
       }
+      Vue.set(vue, 'loading', !this.loading);
       if (a) {
         return true
-      }
-      else {
+      } else {
         return false
       }
     },
-    getData(dataQuery) {
 
+    getData(dataQuery) {
       if (~dataQuery.toUpperCase().indexOf("LIST:")) dataQuery = dataQuery.toUpperCase().replace('LIST:', '?amount=' + this.amount + '&offset=' + this.offset + '&attrs=sku,salePrice,image&searchTerm=');
       else if (~dataQuery.toUpperCase().indexOf("PRODUCT:")) dataQuery = dataQuery.toUpperCase().replace('PRODUCT:', '');
-
-
       try {
         Vue.set(vue, 'temp', this.requestJson('GET', this.createUrl('products/' + dataQuery)));
       } catch (e) {
@@ -70,7 +76,7 @@ var vue = new Vue({
         if (this.temp.elements.length == 1) {
           this.viewProduct(this.temp.elements[0].attributes[0].value);
         } else {
-          this.createPagination(this.temp.elements ,'data');
+          this.createPagination(this.temp.elements, 'data');
           this.changePage('list');
         }
       } else if ('sku' in this.temp) {
@@ -78,16 +84,17 @@ var vue = new Vue({
         if (this.product != '') {
           this.viewProduct();
         }
-      }
-      else {
+      } else {
         return false
       }
       Vue.set(vue, 'temp', {});
       return true
     },
+
     cheatButton(result, event) {
       this.onDecode(result);
     },
+
     changePage(value) {
       if (value === 'scan') {
         Vue.set(vue, 'data', []);
@@ -95,6 +102,7 @@ var vue = new Vue({
       }
       Vue.set(vue, 'page', value)
     },
+
     viewProduct(id) {
       if (id) {
         this.getData(id);
@@ -103,6 +111,7 @@ var vue = new Vue({
       Vue.set(vue.product, 'imageLink', this.getImage(id, 'L'))
       this.changePage('product')
     },
+
     next() {
       if (this.pagination < this.data.length - 1) {
         Vue.set(vue, 'pagination', this.pagination + 1);
@@ -112,6 +121,7 @@ var vue = new Vue({
         this.getData(this.result);
       }
     },
+
     prev() {
       if (this.pagination > 0) {
         Vue.set(vue, 'pagination', this.pagination - 1);
@@ -121,6 +131,7 @@ var vue = new Vue({
         this.getData(this.result);
       }
     },
+
     getImage(data, index, size) {
       size = size || "S";
       var img = new Image();
@@ -129,6 +140,7 @@ var vue = new Vue({
       return img.src
 
     },
+
     createPagination(content, target) {
       Vue.set(vue, target, []);
       a = [];
@@ -136,19 +148,22 @@ var vue = new Vue({
         a.push(content.splice(0, this.amount / this.maxPages));
       Vue.set(vue, target, a);
     },
+
     createUrl(dataQuery) {
       // Sellsmart Server
-      // return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
+      return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
 
       // JX Demo Server
       return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/inSPIRED-inTRONICS-Site/-/" + dataQuery;
     },
+
     setCookie(name, data, minutes) {
-      minutes = minutes || 30;
+      minutes = minutes || 20;
       var date = new Date();
       date.setTime(date.getTime() + (minutes * 60 * 1000));
       document.cookie = name + "=" + data + "; expires=" + date.toGMTString();
     },
+
     getCookie(cname) {
       var name = cname + "=";
       var decodedCookie = decodeURIComponent(document.cookie);
@@ -164,12 +179,16 @@ var vue = new Vue({
       }
       return "";
     },
+
     createBasket() {
       if (!this.getCookie('authentication-token')) {
         a = this.requestJson('POST', this.createUrl('baskets'));
         Vue.set(vue, 'basket', a);
+        return a
       }
+      return false
     },
+
     addToBasket(id, quantity) {
       quantity = quantity || 1
       data = {
@@ -183,13 +202,26 @@ var vue = new Vue({
       a = this.requestJson('POST', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true, data);
       return a;
     },
+
     getBasket() {
       a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true);
-      data = a;
-      Vue.set(vue, 'basket', data.elements);
+      Vue.set(vue, 'basket', a.elements);
       this.changePage('basket');
-      return data;
+      return true;
     },
+
+    changeBasketItem(id, quantity) {
+      data = {
+        'quantity': {
+          'value': quantity
+        }
+      }
+      a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + id), true, data);
+      console.log(a);
+      this.getBasket()
+      return true;
+    },
+
     removeFromBasket(id) {
       console.log(id);
       try {
@@ -202,6 +234,7 @@ var vue = new Vue({
       return a;
     }
   },
+
   filters: {
     limitWords(textToLimit, wordLimit) {
       if (!textToLimit) {
@@ -224,5 +257,9 @@ var vue = new Vue({
         return finalText + "...";
       } else return textToLimit;
     }
+  },
+
+  ready() {
+    this.createBasket();
   }
 });

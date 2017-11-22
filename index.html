@@ -14,10 +14,8 @@
 <body>
 
   <div id="app-root">
+    <div class="loading" v-show="loading == true">IK LAAD</div>
     <transition name="slide-fade" mode="in-out">
-      <!-- Loading screen -->
-      <!-- <section v-if="loading" class="loading page" key="loading">
-      </section> -->
       <!--Scan page-->
       <section v-if="page == 'scan'" class="scan_page page" key="scan">
         <div class="wrapper">
@@ -63,7 +61,7 @@
             </div>
             <div class="productinfo">
               <p>Naam:{{value.title}}</p>
-              <p>Prijs: € {{value.attributes[2].value.value}}</p>
+              <p v-if="value.attributes[2]">Prijs: € {{value.attributes[2].value.value}}</p>
               <p>Descriptie: {{value.description | limitWords(20)}}</p>
             </div>
           </div>
@@ -123,6 +121,8 @@
               <img v-bind:src="getImage(value.product.title, index)" onerror="this.src='./assets/scandog.png'" />
             </div>
             {{value.name}}<br> {{value.quantity.value}}
+            <counter></counter>
+            <button type="button" name="button" @click='changeBasketItem(value.id, $children[index].counter)'>aanpassen</button>
             <br>
             <button type="button" name="button" @click='removeFromBasket(value.id)'>verwijder</button>
           </div>
@@ -140,7 +140,7 @@
 
     </transition>
     <div v-if="page" class="footer bg-light-green tc">
-      ye
+      SellSmart
     </div>
   </div>
 
