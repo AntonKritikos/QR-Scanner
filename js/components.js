@@ -1,7 +1,10 @@
 Vue.component('counter', {
-  template : '<div><button @click="decreaseCounter(1)">-</button>{{counter}}<button @click="increaseCounter(20)">+</button></div>',
+  props:['cur-amt'],
+  template : '<div class="counter"><div @click="decreaseCounter(0)">-</div><div class="countNum">{{counter}}</div><div @click="increaseCounter(20)">+</div></div>',
   data: function(){
-    return {counter:1}
+    return {
+      counter:0
+    }
   },
   methods: {
     increaseCounter(increaseLimit) {
@@ -12,5 +15,8 @@ Vue.component('counter', {
       if (this.counter > decreaseLimit)
         this.counter--;
     }
+  },
+  created(){
+    this.counter = this.curAmt;
   }
 });

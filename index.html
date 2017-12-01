@@ -15,7 +15,7 @@
 
   <div id="app-root">
     <div class="loading" v-show="loading == true">IK LAAD</div>
-    <transition name="slide-fade" mode="in-out">
+    <transition name="slide-fade">
       <!--Scan page-->
       <section v-if="page == 'scan'" class="scan_page page" key="scan">
         <div class="wrapper">
@@ -24,60 +24,41 @@
             <qrcode-reader @capture="onCapture" id="preview">
             </qrcode-reader>
           </div>
-
-
           <div class="fl w-100 bg-light-green">
             <div class="w-80 mscan">
               <h1>Scan een qr code</h1>
             </div>
           </div>
-
           <div class="fl w-100">
             <div class="w-80 mscan">
               <h3>Wilt u een product die u eerder heeft besteld opnieuw bestellen?</h3>
               <h3>Scan de qr code op het product en dit gaat heel gemakkelijk </h3>
             </div>
           </div>
-
           <div class="fl w-third">
             <div class="output">
-
             </div>
           </div>
-
         </div>
-
       </section>
 
 
 
       <!--Product list-->
 
-      <section v-if="page == 'list'" class="list_page page fl w-100" key="list">
+      <section v-if="page == 'list'" class="list_page page fl w-100" key="list" v-on:scroll="listScroll">
         <div class="itemlist">
-          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data[pagination]" @click="viewProduct(value.attributes[0].value)">
+          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data" @click="viewProduct(value.attributes[0].value)">
             <div class="picdiv">
-              <img v-bind:src="getImage(value.attributes[0].value, index)" onerror="this.src='./assets/scandog.png'" />
+              <img v-bind:src="getImage(value.attributes[1].value, index)" onerror="this.src='./assets/scandog.png'" />
             </div>
             <div class="productinfo">
-              <p>Naam:{{value.title}}</p>
-              <p v-if="value.attributes[2]">Prijs: € {{value.attributes[2].value.value}}</p>
-              <p>Descriptie: {{value.description | limitWords(20)}}</p>
+              <h2>{{value.title}}</h2>
+              <p v-if="value.attributes[2]">€ {{value.attributes[2].value.value}}</p>
+              <p>{{value.description | limitWords(20)}}</p>
             </div>
           </div>
         </div>
-        <div class="listnav bg-green">
-          <span @click="prev()" class="ti-angle-double-left listnavbuttons"></span>
-          <span @click="next()" class="ti-angle-double-right listnavbuttons fr"></span>
-          <div class="tc">
-            <button @click="changePage('scan')" class="backbtn bg-light-green">
-              Terug
-            </button>
-          </div>
-        </div>
-
-
-
       </section>
 
       <!--Product detail page -->
@@ -91,26 +72,16 @@
             <h3>{{product.name}}</h3>
           </div>
           <div class="productdescription">
-            <p>{{product.longDescription}}</p>
+            <p><span v-html="product.longDescription"></span></p>
           </div>
           € {{product.salePrice.value}} {{product.salePrice.priceText}}
           <div>
-            <counter prop-name="counter" ></counter>
-            <button type="button" name="button" @click='addToBasket(product.sku, $children[0].counter)'>Koop</button>
+            <counter :cur-amt='1' ></counter>
+            <div class="addToBasket">
+              <p class="ti-plus" @click='addToBasket(product.sku, $children[0].counter)'>In Winkelwagen</p>
+            </div>
           </div>
-
-
         </div>
-
-        <button v-if='data.length != 0' @click="changePage('list')">
-          Terug
-        </button>
-        <button v-else-if='basket.length != 0' @click="changePage('basket')">
-          Terug
-        </button>
-        <button v-else @click="changePage('scan')">
-          Terug
-        </button>
       </section>
 
       <!-- Basket page -->
@@ -118,29 +89,34 @@
         <div class="itemlist">
           <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in basket">
             <div class="picdiv">
-              <img v-bind:src="getImage(value.product.title, index)" onerror="this.src='./assets/scandog.png'" />
+              <!-- <img v-bind:src="getImage(value.attributes[1].value, index)" onerror="this.src='./assets/scandog.png'" /> -->
             </div>
-            {{value.name}}<br> {{value.quantity.value}}
-            <counter></counter>
-            <button type="button" name="button" @click='changeBasketItem(value.id, $children[index].counter)'>aanpassen</button>
+            {{value.name}}
+            <div name="button" @click='changeBasketItem(value.id, $children[index].counter, index)'>
+              <counter v-bind:cur-amt="value.quantity.value">@{{index}}</counter>
+            </div>
             <br>
             <button type="button" name="button" @click='removeFromBasket(value.id)'>verwijder</button>
           </div>
         </div>
-        <div class="listnav bg-green">
-          <span @click="prev()" class="ti-angle-double-left listnavbuttons"></span>
-          <span @click="next()" class="ti-angle-double-right listnavbuttons fr"></span>
-          <div class="tc">
-            <button @click="changePage('scan')" class="backbtn bg-light-green">
-              Terug
-            </button>
-          </div>
-        </div>
       </section>
-
     </transition>
-    <div v-if="page" class="footer bg-light-green tc">
-      SellSmart
+    <div class="footer">
+      <div class="listnav bg-green">
+        <div class="fl w-third" @click="pageBack()">
+          <div class="ti-arrow-left listnavbuttons" v-show="page != 'scan'"></div>
+        </div>
+        <div class="fl w-third" @click="getBasket()" >
+          <span class="ti-shopping-cart listnavbuttons"></span>
+        </div>
+        <div class="fl w-third">
+          <span class="ti-menu listnavbuttons"></span>
+        </div>
+      </div>
+
+      <div v-if="page" class="bg-light-green tc">
+        SellSmart
+      </div>
     </div>
   </div>
 
