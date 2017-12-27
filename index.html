@@ -14,15 +14,16 @@
 <body>
 
   <div id="app-root">
+
     <div class="loading" v-show="loading == true">IK LAAD</div>
     <transition name="slide-fade">
+
       <!--Scan page-->
       <section v-if="page == 'scan'" class="scan_page page" key="scan">
         <div class="wrapper">
 
           <div class="fl w-100">
-            <qrcode-reader @capture="onCapture" id="preview">
-            </qrcode-reader>
+            <qrcode-reader @capture="onCapture" @init="onInit" id="preview"></qrcode-reader>
           </div>
           <div class="fl w-100 bg-light-green">
             <div class="w-80 mscan">
@@ -42,10 +43,7 @@
         </div>
       </section>
 
-
-
       <!--Product list-->
-
       <section v-if="page == 'list'" class="list_page page fl w-100" key="list" v-on:scroll="listScroll">
         <div class="itemlist">
           <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data" @click="viewProduct(value.attributes[0].value)">
@@ -85,44 +83,125 @@
       </section>
 
       <!-- Basket page -->
+
       <section v-if="page == 'basket'" class="basket_page page fl w-100" key="basket">
         <div class="itemlist">
           <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in basket">
             <div class="picdiv">
-              <!-- <img v-bind:src="getImage(value.attributes[1].value, index)" onerror="this.src='./assets/scandog.png'" /> -->
+              <img v-bind:src="getBasketImg(value.product.title,index)" onerror="this.src='./assets/scandog.png'" />
             </div>
-            {{value.name}}
-            <div name="button" @click='changeBasketItem(value.id, $children[index].counter, index)'>
-              <counter v-bind:cur-amt="value.quantity.value">@{{index}}</counter>
+            <div class="productinfo">
+              {{value.name}}
+              <!-- <div class="button" @click='changeBasketItem(value.id, $children[index].counter, index)'v-model.lazy="update"> -->
+                <counter v-bind:cur-amt="value.quantity.value"v-bind:index="index"v-bind:id="value.id"></counter>
+              <!-- </div> -->
+              <p class="ti-close remove" @click='removeFromBasket(value.id)'></p>
             </div>
-            <br>
-            <button type="button" name="button" @click='removeFromBasket(value.id)'>verwijder</button>
+          </div>
+          <div v-show="basket.totalPrice > 0" class=" items total w-100" style="color:black;">
+            {{basket.totalPrice}}
+            <span class="checkoutButton" @click="changePage('invoice')">Checkout</span>
           </div>
         </div>
       </section>
+
+      <!-- invoice page -->
+
+      <section v-if="page == 'invoice'" class="invoice_page page fl w-100" key="invoice" >
+        <h1>Gegevens</h1>
+        <form class="form" v-on:submit.prevent="setInvoiceAddress(invoiceToAddress)"  method="POST" action="">
+
+          <h2>Naam</h2>
+          <select v-model="invoiceToAddress.title">
+            <option disabled value="" class="dropDefault">Aanhef</option>
+            <option>Dhr</option>
+            <option>Mevr</option>
+          </select>
+          <input type="text" value="" placeholder="Voornaam" v-model.lazy="invoiceToAddress.firstName" required>
+          <input type="text" value="" placeholder="Achternaam" v-model.lazy="invoiceToAddress.lastName" required>
+
+          <h2>Locatie</h2>
+          <select v-model.lazy="invoiceToAddress.country">
+            <option disabled value="" class="dropDefault">Land</option>
+            <option>Nederland</option>
+          </select>
+          <input type="text" class="city" value="" placeholder="Stad" v-model.lazy="invoiceToAddress.city" required>
+          <input type="text" class="postalCode" value="" placeholder="Post Code" v-model.lazy="invoiceToAddress.postalCode" required>
+          <!-- <input type="text" value="" placeholder="Country Code" v-model.lazy="invoiceToAddress.countryCode"> -->
+          <input type="text" value="" placeholder="Adres" v-model.lazy="invoiceToAddress.addressLine1" required>
+
+          <h2>Contact</h2>
+          <input type="tel" value="" placeholder="Telefoon nummer" v-model.lazy="invoiceToAddress.phoneMobile" required>
+          <input type="email" value="" placeholder="E-mail" v-model.lazy="invoiceToAddress.email" required>
+          <input type="submit" value="Verder">
+        </form>
+      </section>
+
+      <!-- invoice page -->
+
+      <section v-if="page == 'shipping'" class="shipping_page page fl w-100" key="shipping">
+        <h1>Verzend Adres</h1>
+        <input type="radio" id="useAddress" v-bind:value="false" v-model="altAddress" selected><label for="useAddress">Gebruik Factuur Adres</label></input>
+
+        <br>
+        <input type="radio" id="newAddress" v-bind:value="true" v-model="altAddress"><label for="newAddress">Gebruik Ander Adres</label></input>
+
+        <form class="form" v-on:submit.prevent="setShippingAddress()"  method="POST" action="">
+          <transition name="open" mode="out-in">
+            <div v-if="altAddress == true" class="altShipping" key="true">
+              <h2>Naam</h2>
+              <select v-model="commonShipToAddress.title">
+                <option disabled value="" class="dropDefault">Aanhef</option>
+                <option>Dhr</option>
+                <option>Mevr</option>
+              </select>
+              <input type="text" value="" placeholder="Voornaam" v-model.lazy="commonShipToAddress.firstName" required>
+              <input type="text" value="" placeholder="Achternaam" v-model.lazy="commonShipToAddress.lastName" required>
+
+              <h2>Locatie</h2>
+              <select v-model.lazy="commonShipToAddress.country">
+                <option disabled value="" class="dropDefault">Land</option>
+                <option>Nederland</option>
+              </select>
+              <input type="text" class="city" value="" placeholder="Stad" v-model.lazy="commonShipToAddress.city" required>
+              <input type="text" class="postalCode" value="" placeholder="Post Code" v-model.lazy="commonShipToAddress.postalCode" required>
+              <!-- <input type="text" value="" placeholder="Country Code" v-model.lazy="commonShipToAddress.countryCode"> -->
+              <input type="text" value="" placeholder="Adres" v-model.lazy="commonShipToAddress.addressLine1" required>
+
+              <h2>Contact</h2>
+              <!-- <input type="tel" value="" placeholder="Telefoon nummer" v-model.lazy="commonShipToAddress.phoneMobile" required> -->
+              <input type="email" value="" placeholder="E-mail" v-model.lazy="commonShipToAddress.email" required>
+            </div>
+          </transition>
+          <input type="submit" value="Verder">
+        </form>
+      </section>
+
+      <section v-if="page == 'order'" class="order_page page fl w-100" key="order">
+      </section>
+
     </transition>
+
     <div class="footer">
       <div class="listnav bg-green">
-        <div class="fl w-third" @click="pageBack()">
-          <div class="ti-arrow-left listnavbuttons" v-show="page != 'scan'"></div>
-        </div>
-        <div class="fl w-third" @click="getBasket()" >
+        <div class="w-third" @click="pageBack()">
+          <span class="ti-arrow-left listnavbuttons" v-show="page != 'scan'"></span>
+        </div><div class="w-third" @click="getBasket()" >
           <span class="ti-shopping-cart listnavbuttons"></span>
-        </div>
-        <div class="fl w-third">
+        </div><div class="w-third">
           <span class="ti-menu listnavbuttons"></span>
         </div>
       </div>
-
-      <div v-if="page" class="bg-light-green tc">
+      <div class="bg-light-green tc">
         SellSmart
       </div>
     </div>
+
   </div>
 
-  <link rel="stylesheet" href="vue-qrcode-reader/dist/vue-qrcode-reader.css" />
-  <script src="js/vue.js"></script>
-  <script src="vue-qrcode-reader/dist/vue-qrcode-reader.browser.js"></script>
+  <link rel="stylesheet" href="vue/vue-qrcode-reader.css" />
+  <script src="vue/vue.js"></script>
+  <script src="vue/vue-qrcode-reader.browser.js"></script>
   <script src="js/components.js"></script>
   <script src="js/master.js"></script>
 </body>

@@ -13,7 +13,22 @@ var vue = new Vue({
     pagination: 0,
     maxPages: 1,
     basket: {},
-    loading: false
+    loading: false,
+    invoiceToAddress:{
+      type : "Address",
+      mainDivision : "",
+      title : "",
+      country : ""
+    },
+    commonShipToAddress:{
+      type : "Address",
+      mainDivision : "",
+      title : "",
+      country : ""
+    },
+    selected:"",
+    update:"",
+    altAddress:false
   },
 
   methods: {
@@ -32,23 +47,52 @@ var vue = new Vue({
       var Httpreq = new XMLHttpRequest();
       try {
         Httpreq.open(type, Url, false);
+        if (reqAuth) {
+          Httpreq.setRequestHeader('authentication-token', this.getCookie('authentication-token'));
+        }
+        Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        Httpreq.send(JSON.stringify(data));
       } catch (e) {
         console.log(e);
       }
-      if (reqAuth) {
-        Httpreq.setRequestHeader('authentication-token', this.getCookie('authentication-token'));
-      }
-      Httpreq.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-      Httpreq.send(JSON.stringify(data));
+      try {
+        if (!Url.endsWith("baskets")) {
+          a = JSON.parse(Httpreq.responseText);
+        }
+        else {
+          a = [Httpreq.responseText,Httpreq.getResponseHeader('authentication-token')];
 
-      if (this.getCookie() || type != 'POST') {
-        a = JSON.parse(Httpreq.responseText);
+        }
+      } catch (e) {
+        a = Httpreq.responseText;
+      } finally {
+        return a
+      }
+
+    },
+    async onInit(promise) {
+      // show loading indicator
+      this.loading = true;
+      try {
+        await promise
+
+        // successfully initialized
+      } catch (error) {
+        if (error.name === 'NotAllowedError') {
+          // user denied camera access permisson
+        } else if (error.name === 'NotFoundError') {
+          // no suitable camera device installed
+        } else if (error.name === 'NotSupportedError') {
+          // page is not served over HTTPS (or localhost)
+        } else if (error.name === 'NotReadableError') {
+          // maybe camera is already in use
+        } else {
+          // browser is probably lacking features (WebRTC, Canvas)
+        }
+      } finally {
+        this.loading = true;
 
       }
-      else {
-        a = Httpreq;
-      }
-      return a
     },
 
     onDecode(result) {
@@ -76,7 +120,7 @@ var vue = new Vue({
         alert(e);
       }
       if ('elements' in this.temp && this.temp.elements.length != 0) {
-        if (this.temp.elements.length == 1) {
+        if (this.temp.elements.length == 1 && this.data.length == 0 ) {
           this.viewProduct(this.temp.elements[0].attributes[0].value);
         } else {
           this.addToList(this.temp.elements);
@@ -125,7 +169,7 @@ var vue = new Vue({
     },
 
     addToList(content) {
-      Vue.set(vue, target, this.data.concat(content));
+      Vue.set(vue, 'data', this.data.concat(content));
     },
 
     createUrl(dataQuery) {
@@ -162,10 +206,15 @@ var vue = new Vue({
     createBasket() {
       if (!this.getCookie('authentication-token')) {
         a = this.requestJson('POST', this.createUrl('baskets'));
-        this.setCookie('authentication-token', a.getResponseHeader('authentication-token'));
-        this.setCookie('basket-id', (JSON.parse(a.responseText)).title);
-        Vue.set(vue, 'basket', JSON.parse(a.responseText));
-        return a
+        this.setCookie('authentication-token', a[1]);
+        this.setCookie('basket-id', (JSON.parse(a[0])).title);
+        Vue.set(vue, 'basket', JSON.parse(a[0]));
+        if (!this.getCookie('authentication-token')) {
+          alert("You are blocking cookies");
+        }
+        else {
+          return a
+        }
       }
       return false
     },
@@ -188,13 +237,26 @@ var vue = new Vue({
     },
 
     getBasket() {
+      this.getBasketItems();
+      if (this.basket.length > 0) {
+        this.getBasketValue();
+        return true
+      }
+    },
+
+    getBasketValue() {
+      a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id')), true);
+      Vue.set(vue.basket, "totalPrice", a.totals.basketTotal.value);
+      return a
+    },
+
+    getBasketItems() {
       this.createBasket();
       a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true);
       if ('elements' in a) {
         Vue.set(vue, 'basket', a.elements);
         this.changePage('basket');
       }
-
       return true;
     },
 
@@ -204,15 +266,31 @@ var vue = new Vue({
         return false;
       }
       else {
-        data = {
-          'quantity': {
-            'value': quantity
-          }
-        }
         Vue.set(vue.basket[index].quantity, 'value', quantity);
-        a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + id), true, data);
+        if (this.update) {
+          clearTimeout(this.update);
+          this.update = null;
+        }
+        this.update = setTimeout("vue.updateBasket()", 1000);
+
         return true;
       }
+    },
+
+    updateBasket(){
+      for (var i = 0; i < this.basket.length; i++) {
+        data = {
+          'quantity': {
+            'value': this.basket[i].quantity.value
+          }
+        }
+        a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + this.basket[i].id), true, data);
+      }
+      this.getBasketItems();
+      for (var i = 0; i < this.basket.length; i++) {
+        this.$children[0].counter = this.basket[0].quantity.value;
+      }
+      this.getBasketValue();
     },
 
     removeFromBasket(id) {
@@ -226,8 +304,77 @@ var vue = new Vue({
       return a;
     },
 
+    getBasketImg(id,index) {
+      if (!this.basket[index].image) {
+        a = this.requestJson('GET', this.createUrl('products/' + id));
+        // console.log(a.images[1].effectiveUrl);
+        Vue.set(vue.basket[index],"image",this.getImage(a.images[1].effectiveUrl));
+      }
+      return this.basket[index].image
+    },
+
     getBasketOptions() {
       return this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id')), true)
+    },
+
+    setInvoiceAddress(){
+      Vue.set(vue.invoiceToAddress,"countryCode","NL");
+      data = {
+        invoiceToAddress:this.invoiceToAddress
+      };
+      a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id')), true, data);
+      console.log(a);
+      if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
+        this.changePage('shipping');
+      }
+      else {
+        alert(a)
+      }
+
+      return true
+    },
+
+    clearInvoice(){
+      this.invoiceToAddress = {
+        type : "Address",
+        mainDivision : "",
+        title : "",
+        country : ""
+      }
+    },
+
+    setShippingAddress(){
+      if (!this.altAddress) {
+        Vue.set(vue,'commonShipToAddress',{
+          "title" : this.invoiceToAddress.title,
+          "firstName" : this.invoiceToAddress.firstName,
+          "lastName" : this.invoiceToAddress.lastName,
+          "postalCode" : this.invoiceToAddress.postalCode,
+          "email" : this.invoiceToAddress.email,
+          "addressLine1" : this.invoiceToAddress.addressLine1,
+          "mainDivision" : this.invoiceToAddress.mainDivision,
+          "country" : this.invoiceToAddress.country,
+          "countryCode" : this.invoiceToAddress.countryCode,
+          "city" : this.invoiceToAddress.city
+        });
+      }
+      else if (this.altAddress) {
+        Vue.set(vue.commonShipToAddress,"countryCode",this.invoiceToAddress.countryCode);
+        Vue.set(vue.commonShipToAddress,"mainDivision",this.invoiceToAddress.mainDivision);
+      }
+      data = {
+        commonShipToAddress:this.commonShipToAddress
+      };
+      a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id')), true, data);
+      console.log(a);
+      if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
+        this.changePage('order');
+      }
+      else {
+        alert(a)
+      }
+
+      return true
     },
 
     getPayments() {
@@ -235,7 +382,15 @@ var vue = new Vue({
     },
 
     pageBack() {
-      if (this.page == 'product' && this.data.length != 0 || this.page == 'basket' && this.data.length != 0) {
+      if (this.page == 'shipping') {
+        this.changePage('invoice');
+        return true
+      }
+      else if (this.page == 'invoice') {
+        this.changePage('basket');
+        return true
+      }
+      if (this.page == 'product' && this.data.length >= 0 || this.page == 'basket' && this.data.length != 0) {
         this.changePage('list');
         return true
       }
@@ -249,13 +404,14 @@ var vue = new Vue({
       }
       return false
     },
-    
+
     listScroll() {
-      if (vue.page == "list" && (window.innerHeight + document.querySelector('.list_page').scrollTop) >= document.querySelector('.list_page').scrollHeight && vue.data.length == vue.amount + vue.offset) {
+      if (this.page == "list" && (window.innerHeight + document.querySelector('.list_page').scrollTop) >= document.querySelector('.list_page').scrollHeight && vue.data.length == this.amount + this.offset) {
         console.log(1);
+
         Vue.set(vue, 'offset', vue.offset + vue.amount);
         Vue.set(vue, 'pagination', 0);
-        vue.getData(vue.result);
+        vue.getData(this.result);
       }
     }
   },
@@ -283,8 +439,12 @@ var vue = new Vue({
         return finalText + "...";
       } else return textToLimit;
     }
+  },
+  watch: {
+
   }
 });
+// vue.use(VueQrcodeReader);
 function isEmpty(obj) {
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
