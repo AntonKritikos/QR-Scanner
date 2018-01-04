@@ -11,6 +11,7 @@ Vue.component('counter', {
       counter: 0
     }
   },
+
   methods: {
     increaseCounter(increaseLimit) {
       // if (this.counter < increaseLimit)
@@ -29,6 +30,16 @@ Vue.component('counter', {
       if (this.$parent.page == 'basket' && this.counter != this.$parent.basket[this.index].quantity.value) {
         this.$parent.changeBasketItem(this.id, this.counter, this.index)
       }
+    }
+  }
+});
+
+Vue.component('terms-of-service', {
+  template: '<div class="terms-of-service">{{terms}}</div>',
+
+  data: function() {
+    return {
+      terms: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus feugiat, libero ut ornare posuere, massa tellus ultricies justo, vitae vulputate urna erat in nunc. Donec velit velit, feugiat vitae viverra vitae, blandit et lectus. Phasellus ultrices ullamcorper diam, posuere placerat lectus ultricies sed. Maecenas venenatis porttitor erat, at dictum nisl fringilla ac. Ut id orci quis dolor suscipit tincidunt eu at mi. Aliquam at metus in libero iaculis posuere a non metus. Phasellus a ipsum sodales massa ultrices iaculis a in diam. Curabitur varius nisi nisl, sed eleifend magna lobortis et. Nunc sollicitudin mi vel tortor dapibus euismod. Etiam tristique, dui non elementum imperdiet, purus orci fringilla odio, vehicula egestas sem tellus ac metus. Vivamus id egestas erat. Sed non euismod elit."
     }
   }
 });

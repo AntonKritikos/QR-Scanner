@@ -75,8 +75,8 @@
           € {{product.salePrice.value}} {{product.salePrice.priceText}}
           <div>
             <counter :cur-amt='1' ></counter>
-            <div class="addToBasket">
-              <p class="ti-plus" @click='addToBasket(product.sku, $children[0].counter)'>In Winkelwagen</p>
+            <div class="addToBasket" @click='addToBasket(product.sku, $children[0].counter)'>
+              In Winkelwagen
             </div>
           </div>
         </div>
@@ -92,27 +92,25 @@
             </div>
             <div class="productinfo">
               {{value.name}}
-              <!-- <div class="button" @click='changeBasketItem(value.id, $children[index].counter, index)'v-model.lazy="update"> -->
                 <counter v-bind:cur-amt="value.quantity.value"v-bind:index="index"v-bind:id="value.id"></counter>
-              <!-- </div> -->
               <p class="ti-close remove" @click='removeFromBasket(value.id)'></p>
             </div>
           </div>
           <div v-show="basket.totalPrice > 0" class=" items total w-100" style="color:black;">
             {{basket.totalPrice}}
-            <span class="checkoutButton" @click="changePage('invoice')">Checkout</span>
+            <span class="checkoutButton" @click="changePage('invoiceAddress')">Checkout</span>
           </div>
         </div>
       </section>
 
-      <!-- invoice page -->
+      <!-- invoice address page -->
 
-      <section v-if="page == 'invoice'" class="invoice_page page fl w-100" key="invoice" >
+      <section v-if="page == 'invoiceAddress'" class="invoice_page page fl w-100" key="invoiceAddress" >
         <h1>Gegevens</h1>
         <form class="form" v-on:submit.prevent="setInvoiceAddress(invoiceToAddress)"  method="POST" action="">
 
           <h2>Naam</h2>
-          <select v-model="invoiceToAddress.title">
+          <select v-model="invoiceToAddress.title" required>
             <option disabled value="" class="dropDefault">Aanhef</option>
             <option>Dhr</option>
             <option>Mevr</option>
@@ -121,25 +119,24 @@
           <input type="text" value="" placeholder="Achternaam" v-model.lazy="invoiceToAddress.lastName" required>
 
           <h2>Locatie</h2>
-          <select v-model.lazy="invoiceToAddress.country">
+          <select v-model.lazy="invoiceToAddress.country" required>
             <option disabled value="" class="dropDefault">Land</option>
-            <option>Nederland</option>
+            <option value="Netherlands">Nederland</option>
           </select>
           <input type="text" class="city" value="" placeholder="Stad" v-model.lazy="invoiceToAddress.city" required>
           <input type="text" class="postalCode" value="" placeholder="Post Code" v-model.lazy="invoiceToAddress.postalCode" required>
-          <!-- <input type="text" value="" placeholder="Country Code" v-model.lazy="invoiceToAddress.countryCode"> -->
           <input type="text" value="" placeholder="Adres" v-model.lazy="invoiceToAddress.addressLine1" required>
 
           <h2>Contact</h2>
-          <input type="tel" value="" placeholder="Telefoon nummer" v-model.lazy="invoiceToAddress.phoneMobile" required>
+          <input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' value="" placeholder="Telefoon nummer" class="phoneMobile" v-model.lazy="invoiceToAddress.phoneMobile" required>
           <input type="email" value="" placeholder="E-mail" v-model.lazy="invoiceToAddress.email" required>
           <input type="submit" value="Verder">
         </form>
       </section>
 
-      <!-- invoice page -->
+      <!-- shipping address page -->
 
-      <section v-if="page == 'shipping'" class="shipping_page page fl w-100" key="shipping">
+      <section v-if="page == 'shipAddress'" class="address_page page fl w-100" key="shipAddress">
         <h1>Verzend Adres</h1>
         <input type="radio" id="useAddress" v-bind:value="false" v-model="altAddress" selected><label for="useAddress">Gebruik Factuur Adres</label></input>
 
@@ -150,7 +147,7 @@
           <transition name="open" mode="out-in">
             <div v-if="altAddress == true" class="altShipping" key="true">
               <h2>Naam</h2>
-              <select v-model="commonShipToAddress.title">
+              <select v-model="commonShipToAddress.title" required>
                 <option disabled value="" class="dropDefault">Aanhef</option>
                 <option>Dhr</option>
                 <option>Mevr</option>
@@ -159,17 +156,15 @@
               <input type="text" value="" placeholder="Achternaam" v-model.lazy="commonShipToAddress.lastName" required>
 
               <h2>Locatie</h2>
-              <select v-model.lazy="commonShipToAddress.country">
+              <select v-model.lazy="commonShipToAddress.country" required>
                 <option disabled value="" class="dropDefault">Land</option>
-                <option>Nederland</option>
+                <option value="Netherlands">Nederland</option>
               </select>
               <input type="text" class="city" value="" placeholder="Stad" v-model.lazy="commonShipToAddress.city" required>
               <input type="text" class="postalCode" value="" placeholder="Post Code" v-model.lazy="commonShipToAddress.postalCode" required>
-              <!-- <input type="text" value="" placeholder="Country Code" v-model.lazy="commonShipToAddress.countryCode"> -->
               <input type="text" value="" placeholder="Adres" v-model.lazy="commonShipToAddress.addressLine1" required>
 
               <h2>Contact</h2>
-              <!-- <input type="tel" value="" placeholder="Telefoon nummer" v-model.lazy="commonShipToAddress.phoneMobile" required> -->
               <input type="email" value="" placeholder="E-mail" v-model.lazy="commonShipToAddress.email" required>
             </div>
           </transition>
@@ -177,23 +172,74 @@
         </form>
       </section>
 
+      <!-- Select shipping method page -->
+
+      <section v-if="page == 'shipSelect'" class="shipping_page page fl w-100" key="order">
+        <form class="container" method="post" v-on:submit.prevent="setShippingMethod()">
+          <ul>
+            <li class="shipMethods methodSelect" v-for="(value, index) in shippingMethods">
+              <input type="radio" v-bind:name="value.name" v-bind:id="value.id" v-bind:value="value.id" v-model="selectedShipMethod" required >
+              <label v-bind:for="value.id">{{value.name}}</label>
+              <div class="check"></div>
+            </li>
+          </ul>
+          <input type="submit" value="Verder">
+        </form>
+      </section>
+
+      <!-- Select shipping method page -->
+
+      <section v-if="page == 'paySelect'" class="payment_page page fl w-100" key="paySelect">
+        <form class="container" action="index.html" method="post" v-on:submit.prevent="setPaymentMethod()">
+          <ul>
+            <li class="payMethods methodSelect" v-for="(value, index) in payMethods">
+              <input type="radio" name="paymentMethod" v-bind:id="value.id" v-bind:value="value.id" v-model="selectedPayMethod">
+              <label v-bind:for="value.id">{{value.displayName}}</label>
+              <div class="check"></div>
+            </li>
+          </ul>
+          <input type="submit" value="Verder">
+        </form>
+      </section>
+
+      <!-- Create order page -->
+
       <section v-if="page == 'order'" class="order_page page fl w-100" key="order">
+        <div class="tosContainer">
+          <input type="checkbox" id="tosCheck" v-model="acceptTermsAndConditions" value="true"> <label for="tosCheck">Ik accepteer de </label><a @click="changePage('terms')">algemene voorwaarden</a> </input>
+        </div>
+        <input type="submit" value="Bestel" @click="setOrder()">
+      </section>
+
+      <!-- Terms of service -->
+
+      <section v-if="page == 'terms'" class="terms_page page fl w-100" key="terms">
+        <terms-of-service>
+        </terms-of-service>
+      </section>
+
+      <!-- Thank you page -->
+
+      <section v-if="page == 'thankYou'" class="ty_page page fl w-100" key="thankYou">
+        <h1> Bedankt voor uw bestelling te plaatsen {{invoiceToAddress.title}} {{invoiceToAddress.firstName}} {{invoiceToAddress.lastName}}</h1>
+
       </section>
 
     </transition>
 
     <div class="footer">
       <div class="listnav bg-green">
-        <div class="w-third" @click="pageBack()">
-          <span class="ti-arrow-left listnavbuttons" v-show="page != 'scan'"></span>
-        </div><div class="w-third" @click="getBasket()" >
-          <span class="ti-shopping-cart listnavbuttons"></span>
-        </div><div class="w-third">
-          <span class="ti-menu listnavbuttons"></span>
+        <div class="w-third listnavbuttons" @click="pageBack()">
+          <span class="ti-arrow-left" v-show="page != 'scan'"></span>
+        </div><div class="w-third listnavbuttons" @click="getBasket()">
+          <span class="ti-shopping-cart"></span>
+        </div><div class="w-third listnavbuttons">
+          <span class="ti-menu"></span>
         </div>
       </div>
       <div class="bg-light-green tc">
-        SellSmart
+        <!-- Place logo here -->
+        <img src="" width="100px" height="38px" alt="Sellsmart">
       </div>
     </div>
 

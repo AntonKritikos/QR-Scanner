@@ -26,9 +26,13 @@ var vue = new Vue({
       title : "",
       country : ""
     },
-    selected:"",
-    update:"",
-    altAddress:false
+    altAddress:false,
+    acceptTermsAndConditions:false,
+    shippingMethods:[],
+    selectedShipMethod:'',
+    payMethods:[],
+    selectedPayMethod:'',
+    paymentUri:''
   },
 
   methods: {
@@ -97,8 +101,8 @@ var vue = new Vue({
 
     onDecode(result) {
       Vue.set(vue, 'offset', 0);
+      result = result.replace(/ +/g, "");
       Vue.set(vue, 'result', result);
-      Vue.set(vue, 'pagination', 0);
       try {
         var a = this.getData(result);
       } catch (e) {
@@ -137,8 +141,8 @@ var vue = new Vue({
       return true
     },
 
-    cheatButton(result) {
-      this.onDecode(result);
+    test(result) {
+      this.onDecode("list:"+result);
     },
 
     changePage(value) {
@@ -177,7 +181,10 @@ var vue = new Vue({
       // return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
 
       // JX Demo Server
-      return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/inSPIRED-inTRONICS-Site/-/" + dataQuery;
+      if ( dataQuery.indexOf('inSPIRED-inTRONICS-Site/-/') == -1) {
+        dataQuery = 'inSPIRED-inTRONICS-Site/-/' + dataQuery
+      }
+      return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/" + dataQuery;
     },
 
     setCookie(name, data, minutes) {
@@ -205,6 +212,7 @@ var vue = new Vue({
 
     createBasket() {
       if (!this.getCookie('authentication-token')) {
+        this.clearAddresses()
         a = this.requestJson('POST', this.createUrl('baskets'));
         this.setCookie('authentication-token', a[1]);
         this.setCookie('basket-id', (JSON.parse(a[0])).title);
@@ -215,6 +223,9 @@ var vue = new Vue({
         else {
           return a
         }
+      }
+      else {
+        return true
       }
       return false
     },
@@ -237,27 +248,35 @@ var vue = new Vue({
     },
 
     getBasket() {
-      this.getBasketItems();
-      if (this.basket.length > 0) {
-        this.getBasketValue();
-        return true
+      a = this.getBasketItems();
+      if (a) {
+        if (this.basket.length > 0) {
+          a = this.getAllBasketData();
+          Vue.set(vue.basket, "totalPrice", a.totals.basketTotal.value);
+          if ('invoiceToAddress' in a) {
+            Vue.set(vue, "invoiceToAddress", a.invoiceToAddress);
+          }
+          return true
+        }
       }
     },
 
-    getBasketValue() {
+    getAllBasketData() {
       a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id')), true);
-      Vue.set(vue.basket, "totalPrice", a.totals.basketTotal.value);
       return a
     },
 
     getBasketItems() {
-      this.createBasket();
-      a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true);
-      if ('elements' in a) {
-        Vue.set(vue, 'basket', a.elements);
-        this.changePage('basket');
+      a = this.createBasket();
+      if (a) {
+        a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true);
+        if ('elements' in a) {
+          Vue.set(vue, 'basket', a.elements);
+          this.changePage('basket');
+        }
+        return true;
       }
-      return true;
+      return false
     },
 
     changeBasketItem(id, quantity, index) {
@@ -307,7 +326,6 @@ var vue = new Vue({
     getBasketImg(id,index) {
       if (!this.basket[index].image) {
         a = this.requestJson('GET', this.createUrl('products/' + id));
-        // console.log(a.images[1].effectiveUrl);
         Vue.set(vue.basket[index],"image",this.getImage(a.images[1].effectiveUrl));
       }
       return this.basket[index].image
@@ -323,9 +341,8 @@ var vue = new Vue({
         invoiceToAddress:this.invoiceToAddress
       };
       a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id')), true, data);
-      console.log(a);
       if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
-        this.changePage('shipping');
+        this.changePage('shipAddress');
       }
       else {
         alert(a)
@@ -334,8 +351,14 @@ var vue = new Vue({
       return true
     },
 
-    clearInvoice(){
+    clearAddresses(){
       this.invoiceToAddress = {
+        type : "Address",
+        mainDivision : "",
+        title : "",
+        country : ""
+      }
+      this.commonShipToAddress = {
         type : "Address",
         mainDivision : "",
         title : "",
@@ -368,7 +391,9 @@ var vue = new Vue({
       a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id')), true, data);
       console.log(a);
       if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
-        this.changePage('order');
+        b = this.getShippingMethod()
+        Vue.set(vue, 'shippingMethods', b);
+        this.changePage('shipSelect');
       }
       else {
         alert(a)
@@ -377,16 +402,141 @@ var vue = new Vue({
       return true
     },
 
+    setShippingMethod(){
+      data = {
+        "shippingMethod":{
+          id:this.selectedShipMethod
+        }
+      }
+      for (var i = 0; i < this.basket.length; i++) {
+        a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + this.basket[i].id), true, data);
+      }
+
+      if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
+        b = this.getPayments();
+        Vue.set(vue, 'payMethods', b);
+        this.changePage('paySelect');
+      }
+      else {
+        alert(a)
+      }
+
+    },
+
+    getShippingMethod(){
+      var b = []
+      for (var i = 0; i < this.basket.length; i++) {
+        a = this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + this.basket[i].id), true);
+        // console.log(a.eligibleShippingMethods.shippingMethods);
+        for (var j = 0; j < a.eligibleShippingMethods.shippingMethods.length; j++) {
+          for (var k = 0; k < b.length; k++) {
+            if (b[k].id != a.eligibleShippingMethods.shippingMethods[j].id) {
+              b.push(a.eligibleShippingMethods.shippingMethods[j]);
+            }
+          }
+          if (b.length == 0) {
+            b.push(a.eligibleShippingMethods.shippingMethods[j]);
+          }
+        }
+      }
+      return b
+    },
+
+    setPaymentMethod(){
+      a = this.getPaymentMethod();
+      if (a) {
+        data = {
+          "name": this.selectedPayMethod,
+          "type": "Payment"
+        };
+        b = this.requestJson('POST', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true, data);
+        if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
+          this.changePage('order');
+        }
+        else {
+          alert(b)
+        }
+      }
+      else {
+        this.changePage('order');
+      }
+    },
+
+    getPaymentMethod(){
+      a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true);
+      if (a.elements.length > 0 && a.elements[0].titel == this.selectedPayMethod) {
+        return false
+      }
+      else {
+        if (a.elements.length > 0) {
+          this.removePaymentMethod(a.elements[0].uri);
+        }
+
+        return true
+      }
+    },
+
     getPayments() {
-      return this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true)
+      a = this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true);
+      return a.methods[0].payments
+    },
+
+    removePaymentMethod(uri){
+      this.requestJson('DELETE', this.createUrl(uri), true);
+    },
+
+    setOrder(){
+      if (this.acceptTermsAndConditions == true) {
+        data = {
+          "basketID": this.getCookie('basket-id'),
+          "acceptTermsAndConditions": "true"
+        };
+        a = this.requestJson('POST', this.createUrl('orders/'), true, data);
+        if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
+          this.deleteAllCookies()
+          this.changePage('thankYou');
+        }
+
+      }
+    },
+
+    getOrder(){
+      a = this.requestJson('GET', this.createUrl('orders/' + "NMQKAE0kZpUAAAFg2rFOw7tV"), true);
+    },
+
+    deleteAllCookies() {
+      var cookies = document.cookie.split(";");
+
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i];
+        var eqPos = cookie.indexOf("=");
+        var name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT";
+      }
     },
 
     pageBack() {
-      if (this.page == 'shipping') {
-        this.changePage('invoice');
+      if (this.page == "terms") {
+        this.changePage('order');
         return true
       }
-      else if (this.page == 'invoice') {
+      else if (this.page == "order") {
+        this.changePage('paySelect');
+        return true
+      }
+      else if (this.page == 'paySelect') {
+        this.changePage('shipSelect');
+        return true
+      }
+      else if (this.page == "shipSelect") {
+        this.changePage('shipAddress');
+        return true
+      }
+      else if (this.page == 'shipAddress') {
+        this.changePage('invoiceAddress');
+        return true
+      }
+      else if (this.page == 'invoiceAddress') {
         this.changePage('basket');
         return true
       }
@@ -407,7 +557,6 @@ var vue = new Vue({
 
     listScroll() {
       if (this.page == "list" && (window.innerHeight + document.querySelector('.list_page').scrollTop) >= document.querySelector('.list_page').scrollHeight && vue.data.length == this.amount + this.offset) {
-        console.log(1);
 
         Vue.set(vue, 'offset', vue.offset + vue.amount);
         Vue.set(vue, 'pagination', 0);
