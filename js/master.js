@@ -149,7 +149,7 @@ var vue = new Vue({
       }
       if ('elements' in this.temp && this.temp.elements.length != 0) {
         if (this.temp.elements.length == 1 && this.data.length == 0 ) {
-          this.viewProduct( this.getObjectAtribute(this.getObjectAtribute(this.temp.elements, 'attributes'), 'value'));
+          this.viewProduct( this.getObjectData(this.getObjectData(this.temp.elements, 'attributes'), 'value'));
         } else {
           this.addToList(this.temp.elements);
           this.changePage('list');
@@ -170,7 +170,7 @@ var vue = new Vue({
         this.getData(id);
       }
       id = id || this.product.sku;
-      Vue.set(vue.product, 'imageLink', this.getImage( this.getObjectAtribute(this.product.images, 'L', 'typeID').effectiveUrl ))
+      Vue.set(vue.product, 'imageLink', this.getImage( this.getObjectData(this.product.images, 'L', 'typeID').effectiveUrl ))
       this.changePage('product')
     },
 
@@ -235,7 +235,7 @@ var vue = new Vue({
     getBasketImg(id,index) {
       if (!this.basket[index].image) {
         a = this.requestJson('GET', this.createUrl('products/' + id));
-        Vue.set(vue.basket[index],"image",this.getImage(this.getObjectAtribute(a.images, 'S', 'typeID').effectiveUrl));
+        Vue.set(vue.basket[index],"image",this.getImage(this.getObjectData(a.images, 'S', 'typeID').effectiveUrl));
       }
       return this.basket[index].image
     },
@@ -265,12 +265,12 @@ var vue = new Vue({
 
     getPaymentMethod(){
       a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true);
-      if (a.elements.length > 0 && this.getObjectAtribute(a.elements, this.selectedPayMethod, 'title')) {
+      if (a.elements.length > 0 && this.getObjectData(a.elements, this.selectedPayMethod, 'title')) {
         return false
       }
       else {
         if (a.elements.length > 0) {
-          this.removePaymentMethod(this.getObjectAtribute(a.elements, 'uri'));
+          this.removePaymentMethod(this.getObjectData(a.elements, 'uri'));
         }
 
         return true
@@ -279,7 +279,7 @@ var vue = new Vue({
 
     getPayments() {
       a = this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true);
-      return this.getObjectAtribute(a.methods, 'payments')
+      return this.getObjectData(a.methods, 'payments')
     },
 
     getOrder(){
@@ -296,7 +296,7 @@ var vue = new Vue({
       }
     },
 
-    getObjectAtribute(array, key, identifier){
+    getObjectData(array, key, identifier){
       for (var i = 0; i < array.length; i++) {
         if (identifier && array[i][identifier] == key) {
           return array[i]
@@ -326,6 +326,9 @@ var vue = new Vue({
 
     createUrl(dataQuery) {
       // Sellsmart Server
+      // Did not test this too much so this is still experimental
+      // Images do not work for Sellsmart
+
       // return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
 
       // JX Demo Server
@@ -347,9 +350,9 @@ var vue = new Vue({
       if (!this.getCookie('authentication-token')) {
         this.clearAddresses()
         a = this.requestJson('POST', this.createUrl('baskets'));
-        this.setCookie('authentication-token', this.getObjectAtribute(a, 'authentication-token'));
-        this.setCookie('basket-id', this.getObjectAtribute(a, 'title'));
-        Vue.set(vue, 'basket', this.  getObjectAtribute(a, 'title'));
+        this.setCookie('authentication-token', this.getObjectData(a, 'authentication-token'));
+        this.setCookie('basket-id', this.getObjectData(a, 'title'));
+        Vue.set(vue, 'basket', this.  getObjectData(a, 'title'));
         if (!this.getCookie('authentication-token')) {
           alert("You are blocking cookies");
         }
@@ -589,7 +592,7 @@ var vue = new Vue({
         this.changePage('list');
         return true
       }
-      else if (this.page == 'basket' && isEmpty(this.product) != true) {
+      else if (this.page == 'basket' && 'sku' in this.product) {
         this.changePage('product');
         return true
       }
@@ -625,16 +628,9 @@ var vue = new Vue({
         return finalText + "...";
       } else return textToLimit;
     }
+
   },
   watch: {
 
   }
 });
-// vue.use(VueQrcodeReader);
-function isEmpty(obj) {
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key))
-            return false;
-    }
-    return true;
-}
