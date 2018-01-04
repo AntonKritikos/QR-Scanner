@@ -3,39 +3,53 @@ var vue = new Vue({
   el: '#app-root',
 
   data: {
-    page: 'scan',
-    data: [],
-    offset: 0,
-    amount: 25,
-    product: {},
-    result: '',
-    temp: {},
-    pagination: 0,
-    maxPages: 1,
-    basket: {},
-    loading: false,
-    invoiceToAddress:{
-      type : "Address",
-      mainDivision : "",
-      title : "",
-      country : ""
-    },
-    commonShipToAddress:{
-      type : "Address",
-      mainDivision : "",
-      title : "",
-      country : ""
-    },
-    altAddress:false,
     acceptTermsAndConditions:false,
-    shippingMethods:[],
-    selectedShipMethod:'',
+    altAddress:false,
+    amount:25,
+    basket: {},
+    commonShipToAddress: {
+      country:"",
+      mainDivision:"",
+      title:"",
+      type:"Address"
+    },
+    data:[],
+    invoiceToAddress:{
+      country:"",
+      mainDivision:"",
+      title:"",
+      type:"Address"
+    },
+    loading:false,
+    maxPages:1,
+    offset:0,
+    page:"scan",
+    pagination:0,
     payMethods:[],
-    selectedPayMethod:'',
-    paymentUri:''
+    paymentUri:"",
+    product:{},
+    result:"",
+    selectedPayMethod:"",
+    selectedShipMethod:"",
+    shippingMethods:{},
+    temp:{}
   },
 
   methods: {
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Functions oly to be used while still in development                    //
+    ////////////////////////////////////////////////////////////////////////////
+
+    test(result) {
+      result = result || 'acer';
+      this.onDecode("list:"+result);
+      return result
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    // Functions that are only used by the Vue js QR-Scanner                  //
+    ////////////////////////////////////////////////////////////////////////////
 
     onCapture(event) {
       if (event === null) {
@@ -44,6 +58,53 @@ var vue = new Vue({
         this.onDecode(event.result);
       }
     },
+
+    onDecode(result) {
+      Vue.set(vue, 'offset', 0);
+      result = result.replace(/ +/g, "");
+      Vue.set(vue, 'result', result);
+      try {
+        var a = this.getData(result);
+      } catch (e) {
+        alert(e);
+      }
+      if (a) {
+        return true
+      } else {
+        return false
+      }
+    },
+
+    async onInit (promise) {
+    // show loading indicator
+      try {
+        await promise
+
+        // successfully initialized
+      } catch (error) {
+        if (error.name === 'NotAllowedError') {
+          // user denied camera access permisson
+          alert(error.name)
+        } else if (error.name === 'NotFoundError') {
+          // no suitable camera device installed
+        } else if (error.name === 'NotSupportedError') {
+          // page is not served over HTTPS (or localhost)
+        } else if (error.name === 'NotReadableError') {
+          // maybe camera is already in use
+        } else if (error.name === 'OverconstrainedError') {
+          // passed constraints don't match any camera. Did you requested the front camera although there is none?
+        } else {
+          // browser is probably lacking features (WebRTC, Canvas)
+        }
+      } finally {
+        // hide loading indicator
+        console.log(2);
+      }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    // GET Functions that retrieve data and store it locally                  //
+    ////////////////////////////////////////////////////////////////////////////
 
     requestJson(type, Url, reqAuth, data) {
       reqAuth = reqAuth || false;
@@ -64,7 +125,10 @@ var vue = new Vue({
           a = JSON.parse(Httpreq.responseText);
         }
         else {
-          a = [Httpreq.responseText,Httpreq.getResponseHeader('authentication-token')];
+          a = [
+            JSON.parse(Httpreq.responseText),
+            {'authentication-token':Httpreq.getResponseHeader('authentication-token')}
+          ];
 
         }
       } catch (e) {
@@ -73,46 +137,6 @@ var vue = new Vue({
         return a
       }
 
-    },
-    async onInit(promise) {
-      // show loading indicator
-      this.loading = true;
-      try {
-        await promise
-
-        // successfully initialized
-      } catch (error) {
-        if (error.name === 'NotAllowedError') {
-          // user denied camera access permisson
-        } else if (error.name === 'NotFoundError') {
-          // no suitable camera device installed
-        } else if (error.name === 'NotSupportedError') {
-          // page is not served over HTTPS (or localhost)
-        } else if (error.name === 'NotReadableError') {
-          // maybe camera is already in use
-        } else {
-          // browser is probably lacking features (WebRTC, Canvas)
-        }
-      } finally {
-        this.loading = true;
-
-      }
-    },
-
-    onDecode(result) {
-      Vue.set(vue, 'offset', 0);
-      result = result.replace(/ +/g, "");
-      Vue.set(vue, 'result', result);
-      try {
-        var a = this.getData(result);
-      } catch (e) {
-        alert(e);
-      }
-      if (a) {
-        return true
-      } else {
-        return false
-      }
     },
 
     getData(dataQuery) {
@@ -125,7 +149,7 @@ var vue = new Vue({
       }
       if ('elements' in this.temp && this.temp.elements.length != 0) {
         if (this.temp.elements.length == 1 && this.data.length == 0 ) {
-          this.viewProduct(this.temp.elements[0].attributes[0].value);
+          this.viewProduct( this.getObjectAtribute(this.getObjectAtribute(this.temp.elements, 'attributes'), 'value'));
         } else {
           this.addToList(this.temp.elements);
           this.changePage('list');
@@ -141,24 +165,12 @@ var vue = new Vue({
       return true
     },
 
-    test(result) {
-      this.onDecode("list:"+result);
-    },
-
-    changePage(value) {
-      if (value === 'scan') {
-        Vue.set(vue, 'data', []);
-        Vue.set(vue, 'product', {});
-      }
-      Vue.set(vue, 'page', value)
-    },
-
     viewProduct(id) {
       if (id) {
         this.getData(id);
       }
       id = id || this.product.sku;
-      Vue.set(vue.product, 'imageLink', this.getImage(this.product.images[1].effectiveUrl, 'L'))
+      Vue.set(vue.product, 'imageLink', this.getImage( this.getObjectAtribute(this.product.images, 'L', 'typeID').effectiveUrl ))
       this.changePage('product')
     },
 
@@ -170,28 +182,6 @@ var vue = new Vue({
       // img.src = './assets/icon-no-image.png';
       return img.src
 
-    },
-
-    addToList(content) {
-      Vue.set(vue, 'data', this.data.concat(content));
-    },
-
-    createUrl(dataQuery) {
-      // Sellsmart Server
-      // return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
-
-      // JX Demo Server
-      if ( dataQuery.indexOf('inSPIRED-inTRONICS-Site/-/') == -1) {
-        dataQuery = 'inSPIRED-inTRONICS-Site/-/' + dataQuery
-      }
-      return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/" + dataQuery;
-    },
-
-    setCookie(name, data, minutes) {
-      minutes = minutes || 15;
-      var date = new Date();
-      date.setTime(date.getTime() + (minutes * 60 * 1000));
-      document.cookie = name + "=" + data + "; expires=" + date.toGMTString();
     },
 
     getCookie(cname) {
@@ -208,43 +198,6 @@ var vue = new Vue({
         }
       }
       return "";
-    },
-
-    createBasket() {
-      if (!this.getCookie('authentication-token')) {
-        this.clearAddresses()
-        a = this.requestJson('POST', this.createUrl('baskets'));
-        this.setCookie('authentication-token', a[1]);
-        this.setCookie('basket-id', (JSON.parse(a[0])).title);
-        Vue.set(vue, 'basket', JSON.parse(a[0]));
-        if (!this.getCookie('authentication-token')) {
-          alert("You are blocking cookies");
-        }
-        else {
-          return a
-        }
-      }
-      else {
-        return true
-      }
-      return false
-    },
-
-    addToBasket(id, quantity) {
-      if (quantity != 0) {
-        this.createBasket();
-        quantity = quantity || 1
-        data = {
-          elements: [{
-            'sku': id,
-            'quantity': {
-              'value': quantity
-            }
-          }]
-        }
-        a = this.requestJson('POST', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true, data);
-        return true;
-      }
     },
 
     getBasket() {
@@ -279,6 +232,154 @@ var vue = new Vue({
       return false
     },
 
+    getBasketImg(id,index) {
+      if (!this.basket[index].image) {
+        a = this.requestJson('GET', this.createUrl('products/' + id));
+        Vue.set(vue.basket[index],"image",this.getImage(this.getObjectAtribute(a.images, 'S', 'typeID').effectiveUrl));
+      }
+      return this.basket[index].image
+    },
+
+    getBasketOptions() {
+      return this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id')), true)
+    },
+
+    getShippingMethod(){
+      var b = []
+      for (var i = 0; i < this.basket.length; i++) {
+        a = this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + this.basket[i].id), true);
+        // console.log(a.eligibleShippingMethods.shippingMethods);
+        for (var j = 0; j < a.eligibleShippingMethods.shippingMethods.length; j++) {
+          for (var k = 0; k < b.length; k++) {
+            if (b[k].id != a.eligibleShippingMethods.shippingMethods[j].id) {
+              b.push(a.eligibleShippingMethods.shippingMethods[j]);
+            }
+          }
+          if (b.length == 0) {
+            b.push(a.eligibleShippingMethods.shippingMethods[j]);
+          }
+        }
+      }
+      return b
+    },
+
+    getPaymentMethod(){
+      a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true);
+      if (a.elements.length > 0 && this.getObjectAtribute(a.elements, this.selectedPayMethod, 'title')) {
+        return false
+      }
+      else {
+        if (a.elements.length > 0) {
+          this.removePaymentMethod(this.getObjectAtribute(a.elements, 'uri'));
+        }
+
+        return true
+      }
+    },
+
+    getPayments() {
+      a = this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true);
+      return this.getObjectAtribute(a.methods, 'payments')
+    },
+
+    getOrder(){
+      // Requires user to be logged in so currently does not work
+      a = this.requestJson('GET', this.createUrl('orders/' + "NMQKAE0kZpUAAAFg2rFOw7tV"), true);
+    },
+
+    listScroll() {
+      if (this.page == "list" && (window.innerHeight + document.querySelector('.list_page').scrollTop) >= document.querySelector('.list_page').scrollHeight && vue.data.length == this.amount + this.offset) {
+
+        Vue.set(vue, 'offset', vue.offset + vue.amount);
+        Vue.set(vue, 'pagination', 0);
+        vue.getData(this.result);
+      }
+    },
+
+    getObjectAtribute(array, key, identifier){
+      for (var i = 0; i < array.length; i++) {
+        if (identifier && array[i][identifier] == key) {
+          return array[i]
+        }
+        else if (key in array[i]) {
+          return array[i][key]
+        }
+      }
+      return false
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    // SET Functions that change data locally or on the server                //
+    ////////////////////////////////////////////////////////////////////////////
+
+    changePage(value) {
+      if (value === 'scan') {
+        Vue.set(vue, 'data', []);
+        Vue.set(vue, 'product', {});
+      }
+      Vue.set(vue, 'page', value)
+    },
+
+    addToList(content) {
+      Vue.set(vue, 'data', this.data.concat(content));
+    },
+
+    createUrl(dataQuery) {
+      // Sellsmart Server
+      // return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
+
+      // JX Demo Server
+      if ( dataQuery.indexOf('inSPIRED-inTRONICS-Site/-/') == -1) {
+        dataQuery = 'inSPIRED-inTRONICS-Site/-/' + dataQuery
+      }
+      return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/" + dataQuery;
+    },
+
+    setCookie(name, data, minutes) {
+      minutes = minutes || 15;
+      var date = new Date();
+      date.setTime(date.getTime() + (minutes * 60 * 1000));
+      document.cookie = name + "=" + data + "; expires=" + date.toGMTString();
+    },
+
+    // come to this later
+    createBasket() {
+      if (!this.getCookie('authentication-token')) {
+        this.clearAddresses()
+        a = this.requestJson('POST', this.createUrl('baskets'));
+        this.setCookie('authentication-token', this.getObjectAtribute(a, 'authentication-token'));
+        this.setCookie('basket-id', this.getObjectAtribute(a, 'title'));
+        Vue.set(vue, 'basket', this.  getObjectAtribute(a, 'title'));
+        if (!this.getCookie('authentication-token')) {
+          alert("You are blocking cookies");
+        }
+        else {
+          return a
+        }
+      }
+      else {
+        return true
+      }
+      return false
+    },
+
+    addToBasket(id, quantity) {
+      if (quantity != 0) {
+        this.createBasket();
+        quantity = quantity || 1
+        data = {
+          elements: [{
+            'sku': id,
+            'quantity': {
+              'value': quantity
+            }
+          }]
+        }
+        a = this.requestJson('POST', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true, data);
+        return true;
+      }
+    },
+
     changeBasketItem(id, quantity, index) {
       if (quantity <= 0) {
         this.removeFromBasket(id);
@@ -305,11 +406,10 @@ var vue = new Vue({
         }
         a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + this.basket[i].id), true, data);
       }
-      this.getBasketItems();
+      this.getBasket();
       for (var i = 0; i < this.basket.length; i++) {
-        this.$children[0].counter = this.basket[0].quantity.value;
+        this.$children[i].counter = this.basket[i].quantity.value;
       }
-      this.getBasketValue();
     },
 
     removeFromBasket(id) {
@@ -321,18 +421,6 @@ var vue = new Vue({
       }
       this.getBasket();
       return a;
-    },
-
-    getBasketImg(id,index) {
-      if (!this.basket[index].image) {
-        a = this.requestJson('GET', this.createUrl('products/' + id));
-        Vue.set(vue.basket[index],"image",this.getImage(a.images[1].effectiveUrl));
-      }
-      return this.basket[index].image
-    },
-
-    getBasketOptions() {
-      return this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id')), true)
     },
 
     setInvoiceAddress(){
@@ -389,7 +477,6 @@ var vue = new Vue({
         commonShipToAddress:this.commonShipToAddress
       };
       a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id')), true, data);
-      console.log(a);
       if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
         b = this.getShippingMethod()
         Vue.set(vue, 'shippingMethods', b);
@@ -423,25 +510,6 @@ var vue = new Vue({
 
     },
 
-    getShippingMethod(){
-      var b = []
-      for (var i = 0; i < this.basket.length; i++) {
-        a = this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + this.basket[i].id), true);
-        // console.log(a.eligibleShippingMethods.shippingMethods);
-        for (var j = 0; j < a.eligibleShippingMethods.shippingMethods.length; j++) {
-          for (var k = 0; k < b.length; k++) {
-            if (b[k].id != a.eligibleShippingMethods.shippingMethods[j].id) {
-              b.push(a.eligibleShippingMethods.shippingMethods[j]);
-            }
-          }
-          if (b.length == 0) {
-            b.push(a.eligibleShippingMethods.shippingMethods[j]);
-          }
-        }
-      }
-      return b
-    },
-
     setPaymentMethod(){
       a = this.getPaymentMethod();
       if (a) {
@@ -462,25 +530,6 @@ var vue = new Vue({
       }
     },
 
-    getPaymentMethod(){
-      a = this.requestJson('GET', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true);
-      if (a.elements.length > 0 && a.elements[0].titel == this.selectedPayMethod) {
-        return false
-      }
-      else {
-        if (a.elements.length > 0) {
-          this.removePaymentMethod(a.elements[0].uri);
-        }
-
-        return true
-      }
-    },
-
-    getPayments() {
-      a = this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true);
-      return a.methods[0].payments
-    },
-
     removePaymentMethod(uri){
       this.requestJson('DELETE', this.createUrl(uri), true);
     },
@@ -498,10 +547,6 @@ var vue = new Vue({
         }
 
       }
-    },
-
-    getOrder(){
-      a = this.requestJson('GET', this.createUrl('orders/' + "NMQKAE0kZpUAAAFg2rFOw7tV"), true);
     },
 
     deleteAllCookies() {
@@ -553,16 +598,8 @@ var vue = new Vue({
         return true
       }
       return false
-    },
-
-    listScroll() {
-      if (this.page == "list" && (window.innerHeight + document.querySelector('.list_page').scrollTop) >= document.querySelector('.list_page').scrollHeight && vue.data.length == this.amount + this.offset) {
-
-        Vue.set(vue, 'offset', vue.offset + vue.amount);
-        Vue.set(vue, 'pagination', 0);
-        vue.getData(this.result);
-      }
     }
+
   },
 
   filters: {

@@ -19,11 +19,12 @@
     <transition name="slide-fade">
 
       <!--Scan page-->
+
       <section v-if="page == 'scan'" class="scan_page page" key="scan">
         <div class="wrapper">
 
           <div class="fl w-100">
-            <qrcode-reader @capture="onCapture" @init="onInit" id="preview"></qrcode-reader>
+            <qrcode-reader @capture="onCapture" v-bind:mounted="onInit " id="preview"></qrcode-reader>
           </div>
           <div class="fl w-100 bg-light-green">
             <div class="w-80 mscan">
@@ -44,15 +45,16 @@
       </section>
 
       <!--Product list-->
+
       <section v-if="page == 'list'" class="list_page page fl w-100" key="list" v-on:scroll="listScroll">
         <div class="itemlist">
-          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data" @click="viewProduct(value.attributes[0].value)">
+          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data" @click="viewProduct( getObjectAtribute(value.attributes, 'sku', 'name').value)">
             <div class="picdiv">
-              <img v-bind:src="getImage(value.attributes[1].value, index)" onerror="this.src='./assets/scandog.png'" />
+              <img v-bind:src="getImage(getObjectAtribute(value.attributes, 'image', 'name').value, index)" onerror="this.src='./assets/scandog.png'" />
             </div>
             <div class="productinfo">
               <h2>{{value.title}}</h2>
-              <p v-if="value.attributes[2]">€ {{value.attributes[2].value.value}}</p>
+              <p v-if="getObjectAtribute(value.attributes, 'salePrice', 'name')">€ {{getObjectAtribute(value.attributes, 'salePrice', 'name').value.value}}</p>
               <p>{{value.description | limitWords(20)}}</p>
             </div>
           </div>
@@ -75,7 +77,7 @@
           € {{product.salePrice.value}} {{product.salePrice.priceText}}
           <div>
             <counter :cur-amt='1' ></counter>
-            <div class="addToBasket" @click='addToBasket(product.sku, $children[0].counter)'>
+            <div class="addToBasket" @click='addToBasket(product.sku, getObjectAtribute($children, "counter"))'>
               In Winkelwagen
             </div>
           </div>
