@@ -16,6 +16,7 @@
   <div id="app-root">
 
     <div class="loading" v-show="loading == true">IK LAAD</div>
+
     <transition name="slide-fade">
 
       <!--Scan page-->
@@ -50,7 +51,7 @@
         <div class="itemlist">
           <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data" @click="viewProduct( getObjectData(value.attributes, 'sku', 'name').value)">
             <div class="picdiv">
-              <img v-bind:src="getImage(getObjectData(value.attributes, 'image', 'name').value, index)" onerror="this.src='./assets/scandog.png'" />
+              <img v-bind:src="getImage(getObjectData(value.attributes, 'image', 'name').value, index)" onerror="this.src='./assets/icon-no-image.png'" />
             </div>
             <div class="productinfo">
               <h2>{{value.title}}</h2>
@@ -75,7 +76,12 @@
             <p><span v-html="product.longDescription"></span></p>
           </div>
           € {{product.salePrice.value}} {{product.salePrice.priceText}}
+<<<<<<< HEAD
           
+=======
+          <div>
+            <p v-if="product.amountInBasket">{{product.amountInBasket}} product(en) zijn aan je winkelmandje toegevoegd.</p>
+>>>>>>> b56f8403a5c1838a80fafa203eacbb9291dc23d2
             <counter :cur-amt='1' ></counter>
            
           
@@ -91,7 +97,7 @@
         <div class="itemlist">
           <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in basket">
             <div class="picdiv">
-              <img v-bind:src="getBasketImg(value.product.title,index)" onerror="this.src='./assets/scandog.png'" />
+              <img v-bind:src="getBasketImg(value.product.title,index)" onerror="this.src='./assets/icon-no-image.png'" />
             </div>
             <div class="productinfo">
               {{value.name}}
@@ -131,7 +137,7 @@
           <input type="text" value="" placeholder="Adres" v-model.lazy="invoiceToAddress.addressLine1" required>
 
           <h2>Contact</h2>
-          <input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' value="" placeholder="Telefoon nummer" class="phoneMobile" v-model.lazy="invoiceToAddress.phoneMobile" required>
+          <input type="tel" value="" placeholder="Telefoon nummer" class="phoneMobile" v-model.lazy="invoiceToAddress.phoneMobile" required>
           <input type="email" value="" placeholder="E-mail" v-model.lazy="invoiceToAddress.email" required>
           <input type="submit" value="Verder">
         </form>

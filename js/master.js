@@ -43,6 +43,7 @@ var vue = new Vue({
 
     test(result) {
       result = result || 'acer';
+      result = "list:" + result
       this.onDecode("list:"+result);
       return result
     },
@@ -63,6 +64,7 @@ var vue = new Vue({
       Vue.set(vue, 'offset', 0);
       result = result.replace(/ +/g, "");
       Vue.set(vue, 'result', result);
+      Vue.set(vue, 'data', []);
       try {
         var a = this.getData(result);
       } catch (e) {
@@ -248,7 +250,6 @@ var vue = new Vue({
       var b = []
       for (var i = 0; i < this.basket.length; i++) {
         a = this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items/' + this.basket[i].id), true);
-        // console.log(a.eligibleShippingMethods.shippingMethods);
         for (var j = 0; j < a.eligibleShippingMethods.shippingMethods.length; j++) {
           for (var k = 0; k < b.length; k++) {
             if (b[k].id != a.eligibleShippingMethods.shippingMethods[j].id) {
@@ -282,9 +283,9 @@ var vue = new Vue({
       return this.getObjectData(a.methods, 'payments')
     },
 
-    getOrder(){
+    getOrder(id){
       // Requires user to be logged in so currently does not work
-      a = this.requestJson('GET', this.createUrl('orders/' + "NMQKAE0kZpUAAAFg2rFOw7tV"), true);
+      // a = this.requestJson('GET', this.createUrl(id), true);
     },
 
     listScroll() {
@@ -328,13 +329,11 @@ var vue = new Vue({
       // Sellsmart Server
       // Did not test this too much so this is still experimental
       // Images do not work for Sellsmart
-
-      // return "https://test.sellsmart.nl/sellsmart/rest/WFS/Sellsmart-B2XDefault-Site/-/" + dataQuery;
+      // if ( dataQuery.indexOf('Sellsmart-B2XDefault-Site/-/') == -1) dataQuery = 'Sellsmart-B2XDefault-Site/-/' + dataQuery;
+      // return "https://test.sellsmart.nl/sellsmart/rest/WFS/" + dataQuery;
 
       // JX Demo Server
-      if ( dataQuery.indexOf('inSPIRED-inTRONICS-Site/-/') == -1) {
-        dataQuery = 'inSPIRED-inTRONICS-Site/-/' + dataQuery
-      }
+      if ( dataQuery.indexOf('inSPIRED-inTRONICS-Site/-/') == -1) dataQuery = 'inSPIRED-inTRONICS-Site/-/' + dataQuery;
       return "http://jxdemoserver.intershop.de/INTERSHOP/rest/WFS/" + dataQuery;
     },
 
@@ -379,6 +378,7 @@ var vue = new Vue({
           }]
         }
         a = this.requestJson('POST', this.createUrl('baskets/' + this.getCookie('basket-id') + '/items'), true, data);
+        Vue.set(vue.product,'amountInBasket', quantity);
         return true;
       }
     },
@@ -547,6 +547,8 @@ var vue = new Vue({
         if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
           this.deleteAllCookies()
           this.changePage('thankYou');
+          console.log(a);
+          getOrder(a.uri)
         }
 
       }
