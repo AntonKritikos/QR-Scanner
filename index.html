@@ -75,12 +75,13 @@
             <p><span v-html="product.longDescription"></span></p>
           </div>
           € {{product.salePrice.value}} {{product.salePrice.priceText}}
-          <div>
+          
             <counter :cur-amt='1' ></counter>
-            <div class="addToBasket" @click='addToBasket(product.sku, getObjectData($children, "counter"))'>
+           
+          
+           <div class="addToBasket" @click='addToBasket(product.sku, getObjectData($children, "counter"))'>
               In Winkelwagen
             </div>
-          </div>
         </div>
       </section>
 

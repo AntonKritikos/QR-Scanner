@@ -4,7 +4,7 @@ Vue.component('counter', {
     index: Number,
     id: String
   },
-  template: '<div class="quantity"><button class="plus-btn ti-plus" type="button" @click="increaseCounter(100)"/><input type="text" class="counterInput" v-model.lazy="counter" v-bind:value="counter"><button class="minus-btn ti-minus" type="button" @click="decreaseCounter(0)"/></div>',
+  template: '<div class="quantity"><button class="minus-btn ti-minus" type="button" @click="decreaseCounter(0)"/><input type="text" class="counterInput" v-model.lazy="counter" v-bind:value="counter"><button class="plus-btn ti-plus" type="button" @click="increaseCounter(100)"/></div>',
 
   data: function() {
     return {
