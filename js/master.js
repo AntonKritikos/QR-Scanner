@@ -44,7 +44,7 @@ var vue = new Vue({
     test(result) {
       result = result || 'acer';
       result = "list:" + result
-      this.onDecode("list:"+result);
+      this.onDecode(result);
       return result
     },
 
@@ -144,6 +144,7 @@ var vue = new Vue({
     getData(dataQuery) {
       if (~dataQuery.toUpperCase().indexOf("LIST:")) dataQuery = dataQuery.toUpperCase().replace('LIST:', '?amount=' + this.amount + '&offset=' + this.offset + '&attrs=sku,salePrice,image&searchTerm=');
       else if (~dataQuery.toUpperCase().indexOf("PRODUCT:")) dataQuery = dataQuery.toUpperCase().replace('PRODUCT:', '');
+      // console.log(dataQuery);
       try {
         Vue.set(vue, 'temp', this.requestJson('GET', this.createUrl('products/' + dataQuery)));
       } catch (e) {
@@ -159,6 +160,7 @@ var vue = new Vue({
       } else if ('sku' in this.temp) {
         Vue.set(vue, 'product', this.temp);
         if (this.product != '') {
+          this.viewProduct()
         }
       } else {
         return false
@@ -172,16 +174,27 @@ var vue = new Vue({
         this.getData(id);
       }
       id = id || this.product.sku;
-      Vue.set(vue.product, 'imageLink', this.getImage( this.getObjectData(this.product.images, 'L', 'typeID').effectiveUrl ))
+      try {
+        Vue.set(vue.product, 'imageLink', this.getImage( this.getObjectData(this.product.images, 'L', 'typeID').effectiveUrl ))
+      } catch (e) {
+        Vue.set(vue.product, 'imageLink', this.getImage( this.product.sku, 0, 'L') )
+      }
       this.changePage('product')
     },
 
     getImage(data, index, size) {
       size = size || "S";
       var img = new Image();
-      // img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data + ".jpg";
-      img.src = "http://jxdemoserver.intershop.de" + data;
-      // img.src = './assets/icon-no-image.png';
+      if (data && data.indexOf('INTERSHOP') == -1) {
+        // console.log(data.match('(^[a-zA-Z0-9]+\-STK)'));
+        img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data.match('(^[a-zA-Z0-9]+\-STK)')[0] + ".jpg";
+      }
+      else if (data && data.indexOf('INTERSHOP') > -1) {
+        img.src = "http://jxdemoserver.intershop.de" + data;
+      }
+      else {
+        img.src = './assets/icon-no-image.png';
+      }
       return img.src
 
     },
@@ -590,7 +603,7 @@ var vue = new Vue({
         this.changePage('basket');
         return true
       }
-      if (this.page == 'product' && this.data.length >= 0 || this.page == 'basket' && this.data.length != 0) {
+      if (this.page == 'product' && this.data.length > 0 || this.page == 'basket' && this.data.length != 0) {
         this.changePage('list');
         return true
       }
