@@ -175,19 +175,18 @@ var vue = new Vue({
       }
       id = id || this.product.sku;
       try {
-        Vue.set(vue.product, 'imageLink', this.getImage( this.getObjectData(this.product.images, 'L', 'typeID').effectiveUrl ))
+        Vue.set(vue.product, 'imageLink', this.getImage( this.getObjectData(this.product.images, 'L', 'typeID').effectiveUrl, 'L' ))
       } catch (e) {
-        Vue.set(vue.product, 'imageLink', this.getImage( this.product.sku, 0, 'L') )
+        Vue.set(vue.product, 'imageLink', this.getImage( this.product.sku, 'L') )
       }
       this.changePage('product')
     },
 
-    getImage(data, index, size) {
+    getImage(data, size) {
       size = size || "S";
       var img = new Image();
       if (data && data.indexOf('INTERSHOP') == -1) {
-        // console.log(data.match('(^[a-zA-Z0-9]+\-STK)'));
-        img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data.match('(^[a-zA-Z0-9]+\-STK)')[0] + ".jpg";
+        img.src = "https://demoimages.sellsmart.nl/Sellsmart-B2XDefault-Site/images/" + size + "/" + data.match('([0-9A-z]+\-(STK|stk))')[0] + ".jpg";
       }
       else if (data && data.indexOf('INTERSHOP') > -1) {
         img.src = "http://jxdemoserver.intershop.de" + data;
@@ -444,6 +443,7 @@ var vue = new Vue({
       data = {
         invoiceToAddress:this.invoiceToAddress
       };
+      console.log(JSON.stringify(data));
       a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id')), true, data);
       if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
         this.changePage('shipAddress');
