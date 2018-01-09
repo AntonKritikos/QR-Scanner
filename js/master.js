@@ -179,6 +179,7 @@ var vue = new Vue({
       } catch (e) {
         Vue.set(vue.product, 'imageLink', this.getImage( this.product.sku, 'L') )
       }
+      this.limitWords(this.product.longDescription, 50)
       this.changePage('product')
     },
 
@@ -567,6 +568,33 @@ var vue = new Vue({
       }
     },
 
+    readMore(){
+      if (this.page == 'product') {
+        Vue.set(vue.product, 'finalText', this.product.longDescription)
+      }
+    },
+
+    limitWords(textToLimit, wordLimit) {
+      if (!textToLimit) {
+        return "";
+      }
+      var finalText = "";
+
+      var text2 = textToLimit.replace(/\s+/g, ' ');
+
+      var text3 = text2.split(' ');
+
+      var numberOfWords = text3.length;
+
+      var i = 0;
+
+      if (numberOfWords > wordLimit) {
+        for (i = 0; i < wordLimit; i++)
+          finalText = finalText + " " + text3[i] + " "
+        Vue.set(vue.product,'finalText',finalText);
+      }
+    },
+
     deleteAllCookies() {
       var cookies = document.cookie.split(";");
 
@@ -621,28 +649,6 @@ var vue = new Vue({
   },
 
   filters: {
-
-    limitWords(textToLimit, wordLimit) {
-      if (!textToLimit) {
-        return "";
-      }
-      var finalText = "";
-
-      var text2 = textToLimit.replace(/\s+/g, ' ');
-
-      var text3 = text2.split(' ');
-
-      var numberOfWords = text3.length;
-
-      var i = 0;
-
-      if (numberOfWords > wordLimit) {
-        for (i = 0; i < wordLimit; i++)
-          finalText = finalText + " " + text3[i] + " ";
-
-        return finalText + "<a>...</a>";
-      } else return textToLimit;
-    }
 
   },
   watch: {
