@@ -274,10 +274,7 @@ a:hover{
 }
 
 .quantity {
-  margin-top: 20px;
-  width: 45%%;
-  margin-right: 60px;
-  float: left;
+  float: right;
   /*border-radius: 6px;*/
   height: 30px;
   font-size: 24px;
@@ -399,13 +396,26 @@ input:focus {
 .shipping_page{
   background-color: #B6D8A6;
 }
+.productname {
+  margin-top: 10px;
+}
+.productname h3 {
+  margin: 0px;
+}
 .addToBasket{
   font-size: 18px;
+  text-align: center;
   border-radius: 5px;
   padding:5px 10px;
   width: 45%;
-  margin: 5px 0px;
   background-color: #65AD63;
+  color: white;
+  float: left;
+}
+
+.saleprice {
+  font-size: 25px;
+  margin: 10px 0px;
 }
 
 .pdpimg {
@@ -516,6 +526,19 @@ background: #65AD45;
 
 input[type=radio]:checked ~ label{
 color: #65AD45;
+}
+
+.logo {
+  height: 70%;
+  margin-top: 5px;
+  margin-bottom: 5px;
+
+}
+
+#add {
+  float: left;
+  width: 100%;
+  margin: 10px 0px;
 }
 
 @media screen and (min-width: 766px) {

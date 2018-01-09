@@ -72,18 +72,25 @@
           <div class="productname">
             <h3>{{product.name}}</h3>
           </div>
+
+          <p class="saleprice">€ {{product.salePrice.value}} {{product.salePrice.priceText}}</p>
+
+          <div id="add">
+            <p v-if="product.amountInBasket">{{product.amountInBasket}} product(en) zijn aan je winkelmandje toegevoegd.</p> 
+            
+            <div class="addToBasket" @click='addToBasket(product.sku, getObjectData($children, "counter"))'>
+                In Winkelwagen
+            </div>
+
+            <counter :cur-amt='1' ></counter> 
+          </div>
+
           <div class="productdescription">
             <p><span v-html="product.longDescription"></span></p>
           </div>
-          € {{product.salePrice.value}} {{product.salePrice.priceText}}
-          <div>
-            <p v-if="product.amountInBasket">{{product.amountInBasket}} product(en) zijn aan je winkelmandje toegevoegd.</p>
-            <counter :cur-amt='1' ></counter>
-            <div class="addToBasket" @click='addToBasket(product.sku, getObjectData($children, "counter"))'>
-              In Winkelwagen
-            </div>
-          </div>
+          
         </div>
+
       </section>
 
       <!-- Basket page -->
@@ -242,7 +249,7 @@
       </div>
       <div class="bg-light-green tc">
         <!-- Place logo here -->
-        <img src="" width="100px" height="38px" alt="Sellsmart">
+        <img  class="logo" src="./assets/sellsmart_payoff_wit.png" alt="Sellsmart">
       </div>
     </div>
 
