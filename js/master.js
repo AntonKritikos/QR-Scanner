@@ -640,7 +640,7 @@ var vue = new Vue({
         for (i = 0; i < wordLimit; i++)
           finalText = finalText + " " + text3[i] + " ";
 
-        return finalText + "...";
+        return finalText + "<a>...</a>";
       } else return textToLimit;
     }
 

@@ -76,19 +76,19 @@
           <p class="saleprice">€ {{product.salePrice.value}} {{product.salePrice.priceText}}</p>
 
           <div id="add">
-            <p v-if="product.amountInBasket">{{product.amountInBasket}} product(en) zijn aan je winkelmandje toegevoegd.</p> 
-            
+            <p v-if="product.amountInBasket">{{product.amountInBasket}} product(en) zijn aan je winkelmandje toegevoegd.</p>
+
             <div class="addToBasket" @click='addToBasket(product.sku, getObjectData($children, "counter"))'>
                 In Winkelwagen
             </div>
 
-            <counter :cur-amt='1' ></counter> 
+            <counter :cur-amt='1' ></counter>
           </div>
 
           <div class="productdescription">
-            <p><span v-html="product.longDescription"></span></p>
+            <p><span v-html="$options.filters.limitWords(product.longDescription,50)"></span></p>
           </div>
-          
+
         </div>
 
       </section>
