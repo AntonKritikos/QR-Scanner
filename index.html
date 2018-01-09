@@ -242,7 +242,7 @@
         <div class="w-third listnavbuttons" @click="pageBack()">
           <span class="ti-arrow-left" v-show="page != 'scan'"></span>
         </div><div class="w-third listnavbuttons" @click="getBasket()">
-          <span class="ti-shopping-cart"></span>
+          <span v-show="page == 'scan' || page == 'product' || page == 'list'" class="ti-shopping-cart"></span>
         </div><div class="w-third listnavbuttons">
           <span class="ti-menu"></span>
         </div>

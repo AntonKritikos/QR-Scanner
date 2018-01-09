@@ -54,7 +54,6 @@ var vue = new Vue({
 
     onCapture(event) {
       if (event === null) {
-
       } else {
         this.onDecode(event.result);
       }
@@ -340,8 +339,7 @@ var vue = new Vue({
 
     createUrl(dataQuery) {
       // Sellsmart Server
-      // Did not test this too much so this is still experimental
-      // Images do not work for Sellsmart
+      // Should work if SellSmart updates to Intershop 7.8
       // if ( dataQuery.indexOf('Sellsmart-B2XDefault-Site/-/') == -1) dataQuery = 'Sellsmart-B2XDefault-Site/-/' + dataQuery;
       // return "https://test.sellsmart.nl/sellsmart/rest/WFS/" + dataQuery;
 
@@ -357,7 +355,6 @@ var vue = new Vue({
       document.cookie = name + "=" + data + "; expires=" + date.toGMTString();
     },
 
-    // come to this later
     createBasket() {
       if (!this.getCookie('authentication-token')) {
         this.clearAddresses()
@@ -444,7 +441,6 @@ var vue = new Vue({
       data = {
         invoiceToAddress:this.invoiceToAddress
       };
-      console.log(JSON.stringify(data));
       a = this.requestJson('PUT', this.createUrl('baskets/' + this.getCookie('basket-id')), true, data);
       if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
         this.changePage('shipAddress');
@@ -645,13 +641,6 @@ var vue = new Vue({
       }
       return false
     }
-
-  },
-
-  filters: {
-
-  },
-  watch: {
 
   }
 });

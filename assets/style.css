@@ -413,6 +413,10 @@ input:focus {
   float: left;
 }
 
+.addToBasket:hover{
+  cursor: pointer;
+}
+
 .saleprice {
   font-size: 25px;
   margin: 10px 0px;
