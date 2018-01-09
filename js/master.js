@@ -78,9 +78,10 @@ var vue = new Vue({
 
     async onInit (promise) {
     // show loading indicator
+    console.log(1);
+    
       try {
         await promise
-
         // successfully initialized
       } catch (error) {
         if (error.name === 'NotAllowedError') {
@@ -88,14 +89,23 @@ var vue = new Vue({
           alert(error.name)
         } else if (error.name === 'NotFoundError') {
           // no suitable camera device installed
+          alert(error.name)
+
         } else if (error.name === 'NotSupportedError') {
           // page is not served over HTTPS (or localhost)
+          alert(error.name)
+
         } else if (error.name === 'NotReadableError') {
           // maybe camera is already in use
+          alert(error.name)
+
         } else if (error.name === 'OverconstrainedError') {
           // passed constraints don't match any camera. Did you requested the front camera although there is none?
+          alert(error.name)
+
         } else {
           // browser is probably lacking features (WebRTC, Canvas)
+          alert('error')
         }
       } finally {
         // hide loading indicator
