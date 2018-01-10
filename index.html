@@ -70,7 +70,7 @@
         </div>
         <div class="pdp">
           <div class="productname">
-            <h3>{{product.name}}</h3>
+            <h2>{{product.name}}</h2>
           </div>
 
           <p class="saleprice">€ {{product.salePrice.value}} {{product.salePrice.priceText}}</p>
@@ -78,11 +78,11 @@
           <div id="add">
             <p v-if="product.amountInBasket">{{product.amountInBasket}} product(en) zijn aan je winkelmandje toegevoegd.</p>
 
+            <counter :cur-amt='1' ></counter>
+
             <div class="addToBasket" @click='addToBasket(product.sku, getObjectData($children, "counter"))'>
                 In Winkelwagen
             </div>
-
-            <counter :cur-amt='1' ></counter>
           </div>
 
           <div class="productdescription">
