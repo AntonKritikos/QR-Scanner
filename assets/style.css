@@ -15,9 +15,7 @@ html {
 }
 
 body {
-  position: relative;
   margin: 0;
-  padding-bottom: 6rem;
   min-height: 100%;
   font-family: 'formata-condensed', Arial, sans-serif;
   font-weight: normal;
@@ -411,6 +409,10 @@ input:focus {
   background-color: #65AD63;
   color: white;
   float: right;
+}
+
+.addToBasket:hover{
+  cursor: pointer;
 }
 
 .saleprice {

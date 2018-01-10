@@ -4,7 +4,7 @@ Vue.component('counter', {
     index: Number,
     id: String
   },
-  template: '<div class="quantity"><button class="minus-btn ti-minus" type="button" @click="decreaseCounter(0)"/><input type="text" class="counterInput" v-model.lazy="counter" v-bind:value="counter"><button class="plus-btn ti-plus" type="button" @click="increaseCounter(100)"/></div>',
+  template: '<div class="quantity"><button class="minus-btn ti-minus" type="button" @click="decreaseCounter(0)"/><input type="text" onkeypress="return event.charCode >= 48 && event.charCode <= 57" class="counterInput" v-model="counter" v-bind:value="counter"><button class="plus-btn ti-plus" type="button" @click="increaseCounter(100)"/></div>',
 
   data: function() {
     return {
@@ -14,7 +14,7 @@ Vue.component('counter', {
 
   methods: {
     increaseCounter(increaseLimit) {
-      // if (this.counter < increaseLimit)
+      if (this.counter < increaseLimit)
         this.counter++;
     },
     decreaseCounter(decreaseLimit) {
@@ -27,6 +27,8 @@ Vue.component('counter', {
   },
   watch: {
     counter: function (){
+      if (this.counter < 0) this.counter = 0;
+      if (this.counter > 100) this.counter = 100;
       if (this.$parent.page == 'basket' && this.counter != this.$parent.basket[this.index].quantity.value) {
         this.$parent.changeBasketItem(this.id, this.counter, this.index)
       }
