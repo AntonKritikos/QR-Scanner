@@ -272,7 +272,7 @@ a:hover{
 }
 
 .quantity {
-  float: right;
+  float: left;
   /*border-radius: 6px;*/
   height: 30px;
   font-size: 24px;
@@ -397,7 +397,7 @@ input:focus {
 .productname {
   margin-top: 10px;
 }
-.productname h3 {
+.productname h2 {
   margin: 0px;
 }
 .addToBasket{
@@ -408,7 +408,7 @@ input:focus {
   width: 45%;
   background-color: #65AD63;
   color: white;
-  float: left;
+  float: right;
 }
 
 .addToBasket:hover{
@@ -541,6 +541,16 @@ color: #65AD45;
   float: left;
   width: 100%;
   margin: 10px 0px;
+}
+
+.productdescription {
+  background-color:  #b5d8a6;
+  margin: 0px -15px;
+  padding: 0px 15px;
+  float:  left;
+  color: #323232;
+  margin-top:  15px;
+
 }
 
 @media screen and (min-width: 766px) {
