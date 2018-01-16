@@ -64,6 +64,7 @@ var vue = new Vue({
       result = result.replace(/ +/g, "");
       Vue.set(vue, 'result', result);
       Vue.set(vue, 'data', []);
+      Vue.set(vue, 'product', {});
       try {
         var a = this.getData(result);
       } catch (e) {
@@ -78,8 +79,8 @@ var vue = new Vue({
 
     async onInit (promise) {
     // show loading indicator
-    console.log(1);
-    
+    this.page = "test1"
+
       try {
         await promise
         // successfully initialized
@@ -109,7 +110,7 @@ var vue = new Vue({
         }
       } finally {
         // hide loading indicator
-        console.log(2);
+        this.page = "test2"
       }
     },
 
@@ -153,7 +154,6 @@ var vue = new Vue({
     getData(dataQuery) {
       if (~dataQuery.toUpperCase().indexOf("LIST:")) dataQuery = dataQuery.toUpperCase().replace('LIST:', '?amount=' + this.amount + '&offset=' + this.offset + '&attrs=sku,salePrice,image&searchTerm=');
       else if (~dataQuery.toUpperCase().indexOf("PRODUCT:")) dataQuery = dataQuery.toUpperCase().replace('PRODUCT:', '');
-      // console.log(dataQuery);
       try {
         Vue.set(vue, 'temp', this.requestJson('GET', this.createUrl('products/' + dataQuery)));
       } catch (e) {
@@ -163,7 +163,7 @@ var vue = new Vue({
         if (this.temp.elements.length == 1 && this.data.length == 0 ) {
           this.viewProduct( this.getObjectData(this.getObjectData(this.temp.elements, 'attributes'), 'value'));
         } else {
-          this.addToList(this.temp.elements);
+          Vue.set(vue, 'data', this.data.concat(this.temp.elements));
           this.changePage('list');
         }
       } else if ('sku' in this.temp) {
@@ -264,10 +264,6 @@ var vue = new Vue({
       return this.basket[index].image
     },
 
-    getBasketOptions() {
-      return this.requestJson('OPTIONS', this.createUrl('baskets/' + this.getCookie('basket-id')), true)
-    },
-
     getShippingMethod(){
       var b = []
       for (var i = 0; i < this.basket.length; i++) {
@@ -307,7 +303,7 @@ var vue = new Vue({
 
     getOrder(id){
       // Requires user to be logged in so currently does not work
-      // a = this.requestJson('GET', this.createUrl(id), true);
+      a = this.requestJson('GET', this.createUrl(id), true);
     },
 
     listScroll() {
@@ -319,13 +315,13 @@ var vue = new Vue({
       }
     },
 
-    getObjectData(array, key, identifier){
-      for (var i = 0; i < array.length; i++) {
-        if (identifier && array[i][identifier] == key) {
-          return array[i]
+    getObjectData(parent, child, identifier){
+      for (var i = 0; i < parent.length; i++) {
+        if (identifier && parent[i][identifier] == child) {
+          return parent[i]
         }
-        else if (key in array[i]) {
-          return array[i][key]
+        else if (child in parent[i]) {
+          return parent[i][child]
         }
       }
       return false
@@ -336,20 +332,12 @@ var vue = new Vue({
     ////////////////////////////////////////////////////////////////////////////
 
     changePage(value) {
-      if (value === 'scan') {
-        Vue.set(vue, 'data', []);
-        Vue.set(vue, 'product', {});
-      }
       Vue.set(vue, 'page', value)
-    },
-
-    addToList(content) {
-      Vue.set(vue, 'data', this.data.concat(content));
     },
 
     createUrl(dataQuery) {
       // Sellsmart Server
-      // Should work if SellSmart updates to Intershop 7.8
+      // Should work if test.sellSmart.nl updates to Intershop 7.8+
       // if ( dataQuery.indexOf('Sellsmart-B2XDefault-Site/-/') == -1) dataQuery = 'Sellsmart-B2XDefault-Site/-/' + dataQuery;
       // return "https://test.sellsmart.nl/sellsmart/rest/WFS/" + dataQuery;
 
@@ -388,7 +376,7 @@ var vue = new Vue({
     addToBasket(id, quantity) {
       if (quantity != 0) {
         this.createBasket();
-        quantity = quantity || 1
+         quantity = quantity || 1
         data = {
           elements: [{
             'sku': id,
@@ -446,6 +434,21 @@ var vue = new Vue({
       return a;
     },
 
+    clearAddresses(){
+      this.invoiceToAddress = {
+        type : "Address",
+        mainDivision : "",
+        title : "",
+        country : ""
+      }
+      this.commonShipToAddress = {
+        type : "Address",
+        mainDivision : "",
+        title : "",
+        country : ""
+      }
+    },
+
     setInvoiceAddress(){
       Vue.set(vue.invoiceToAddress,"countryCode","NL");
       data = {
@@ -460,21 +463,6 @@ var vue = new Vue({
       }
 
       return true
-    },
-
-    clearAddresses(){
-      this.invoiceToAddress = {
-        type : "Address",
-        mainDivision : "",
-        title : "",
-        country : ""
-      }
-      this.commonShipToAddress = {
-        type : "Address",
-        mainDivision : "",
-        title : "",
-        country : ""
-      }
     },
 
     setShippingAddress(){
@@ -567,7 +555,6 @@ var vue = new Vue({
         if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
           this.deleteAllCookies()
           this.changePage('thankYou');
-          console.log(a);
           getOrder(a.uri)
         }
 

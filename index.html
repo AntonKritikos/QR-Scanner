@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://unpkg.com/tachyons@4.8.1/css/tachyons.min.css" />
   <link href="assets/style.css" rel="stylesheet" type="text/css">
   <link href="assets/themify-icons.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="vue/vue-qrcode-reader.css" />
 </head>
 
 <body>
@@ -25,7 +26,7 @@
         <div class="wrapper">
 
           <div class="fl w-100">
-            <qrcode-reader @capture="onCapture" v-bind:mounted="onInit " id="preview"></qrcode-reader>
+            <qrcode-reader @capture="onCapture" @init="onInit" id="preview"></qrcode-reader>
           </div>
           <div class="fl w-100 bg-light-green">
             <div class="w-80 mscan">
@@ -239,7 +240,7 @@
 
     <div class="footer">
       <div class="listnav bg-green">
-        <!-- <p @click="test('asus')">test knop</p> -->
+        <!-- <p v-show="page == 'scan'" @click="test('asus')">test knop</p> -->
         <div class="w-third listnavbuttons" @click="pageBack()">
           <span class="ti-arrow-left" v-show="page != 'scan'"></span>
         </div><div class="w-third listnavbuttons" @click="getBasket()">
@@ -256,7 +257,6 @@
 
   </div>
 
-  <link rel="stylesheet" href="vue/vue-qrcode-reader.css" />
   <script src="vue/vue.js"></script>
   <script src="vue/vue-qrcode-reader.browser.js"></script>
   <script src="js/components.js"></script>
