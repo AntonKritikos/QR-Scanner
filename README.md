@@ -1,15 +1,15 @@
-#QR reader webshop with Vue.js and Intershop REST API
+# QR reader webshop with Vue.js and Intershop REST API
 
-##Introduction:
+## Introduction:
 This is a QR-Reader making use of Vue.js and of the Intershop REST API that is on any Intershop product.
 *Current support only for Intershop versions 7.8+*
 
-##Setup:
+## Setup:
 Setting the QR reader up on a localhost server requires you to download or clone the repository, starting your localhost server and finally connect with you localhost and directing your browser to the correct file via the URL.
 *example URL 'localhost/mysite/QR-Scanner/index.html'*
 *If the camera does not work you might need to allow this in your browser's settings or to disable the camera on any other browser and/or application*
 
-##Usage:
+## Usage:
 After you have locally set up the web-application you should be able to use your camera to scan QR-codes, the QR-codes to use have a simple structure to the to simplify the decoding and to lessen the load on the device and to lessen data usage.
 *To be sure the camera is supported it is best to connect to either localhost or an Https server*
 
