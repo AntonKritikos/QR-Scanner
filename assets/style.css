@@ -603,6 +603,10 @@ color: #65AD45;
   font-size: 19px;
  }
 
+ .itemlist > p{
+   color: #000;
+ }
+
 @media screen and (min-width: 766px) {
   .productinfo {
     font-size: 25px;
