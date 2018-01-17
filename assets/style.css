@@ -336,7 +336,6 @@ input:focus {
   outline:0;
 }
 .invoice_page, .address_page{
-  background-color:#B6D8A6;
   width: 100%;
 }
 .invoice_page h1, .address_page h1{
@@ -354,7 +353,6 @@ input:focus {
   width: 92%;
 }
 .form h2{
-  color: white;
   margin: 0;
   margin-top: 2px;
   font-weight: normal;
