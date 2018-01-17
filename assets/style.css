@@ -5,6 +5,12 @@
 }
 
 @font-face {
+  font-family: "Formata-MediumCondensed";
+  src: url("./fonts/formatabold/Formata-MediumCondensed.eot");
+  src: url("./fonts/formatabold/Formata-MediumCondensed.woff") format("woff"), url("./fonts/formatabold/Formata-MediumCondensed.woff2") format("woff2"), url("./fonts/formatabold/Formata-MediumCondensed.ttf") format("truetype"), url("./fonts/formatabold/Formata-MediumCondensed.svg#filename") format("svg");
+}
+
+@font-face {
   font-family: "formata-condensed";
   src: url("./fonts/formata/formata.eot");
   src: url("./fonts/formata/formata.woff") format("woff"), url("./fonts/formata/formata.woff2") format("woff2"), url("./fonts/formata/formata.ttf") format("truetype"), url("./fonts/formata/formata.svg#filename") format("svg");
@@ -182,8 +188,23 @@ a:hover{
   max-height: 0px;
 }
 
+.bg-blue-green {
+  background-color: #639A88;
+  color: #fff;
+}
+
+.bg-light-blue {
+  background-color: #CEE5F2;
+  color: #394648;
+}
+
+.bg-white {
+  background-color: #fff;
+  color: #394648;
+}
+
 .bg-light-green {
-  background-color: #b5d8a6;
+  background-color: #63C06D;
   color: #fff;
 }
 
@@ -208,6 +229,7 @@ a:hover{
 
 .itemlist {
   height: calc(100% - 89px);
+  background-color: #ececec;
 }
 
 .items {
@@ -215,7 +237,6 @@ a:hover{
   overflow: hidden;
   display: inline-block;
   border-top:  1px solid #E1E8EE;
-  border-bottom:  1px solid #E1E8EE;
 }
 
 .items p {
@@ -400,7 +421,7 @@ input:focus {
 .productname h2 {
   margin: 0px;
 }
-.addToBasket{
+.grnbtn {
   font-size: 18px;
   text-align: center;
   border-radius: 5px;
@@ -411,7 +432,7 @@ input:focus {
   float: right;
 }
 
-.addToBasket:hover{
+.grnbtn:hover{
   cursor: pointer;
 }
 
@@ -544,7 +565,6 @@ color: #65AD45;
 }
 
 .productdescription {
-  background-color:  #b5d8a6;
   margin: 0px -15px;
   padding: 0px 15px;
   float:  left;
@@ -552,6 +572,38 @@ color: #65AD45;
   margin-top:  15px;
 
 }
+
+.productdescription h1 {
+  margin: 0px -15px;
+  padding: 5px 15px;
+}
+
+.total {
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  background-color: #006c3d;
+}
+
+.totaltext {
+  float: left;
+}
+
+.totalprice{
+  float: right;
+}
+
+.checkoutdiv {
+    width: 100%;
+    float: left;
+    margin-top: 15px;
+    text-align: right;
+}
+
+ .saleprice {
+  font-family: 'Formata-MediumCondensed', Arial, sans-serif;
+  font-size: 19px;
+ }
 
 @media screen and (min-width: 766px) {
   .productinfo {

@@ -49,13 +49,13 @@
 
       <section v-if="page == 'list'" class="list_page page fl w-100" key="list" v-on:scroll="listScroll">
         <div class="itemlist">
-          <div class="items fl w-100 bg-light-green" :key="index" v-for="(value, index) in data" @click="viewProduct( getObjectData(value.attributes, 'sku', 'name').value)">
+          <div class="items fl w-100 bg-light-blue bg-white" :key="index" v-for="(value, index) in data" @click="viewProduct( getObjectData(value.attributes, 'sku', 'name').value)">
             <div class="picdiv">
               <img v-bind:src="getImage(getObjectData(value.attributes, 'image', 'name').value, index)" onerror="this.src='./assets/icon-no-image.png'" />
             </div>
             <div class="productinfo">
               <h2>{{value.title}}</h2>
-              <p v-if="getObjectData(value.attributes, 'salePrice', 'name')">€ {{getObjectData(value.attributes, 'salePrice', 'name').value.value}}</p>
+              <p class="saleprice" v-if="getObjectData(value.attributes, 'salePrice', 'name')">€ {{getObjectData(value.attributes, 'salePrice', 'name').value.value}}</p>
               <p>{{value.description}}</p>
             </div>
           </div>
@@ -65,7 +65,7 @@
       <!--Product detail page -->
 
       <section v-if="page == 'product'" class="product_page page" key="product">
-        <div class="pdpimg bg-green">
+        <div class="pdpimg bg-blue-green">
           <img v-bind:src="product.imageLink" alt="" />
         </div>
         <div class="pdp">
@@ -80,12 +80,13 @@
 
             <counter :cur-amt='1' ></counter>
 
-            <div class="addToBasket" @click='addToBasket(product.sku, getObjectData($children, "counter"))'>
+            <div class="grnbtn" @click='addToBasket(product.sku, getObjectData($children, "counter"))'>
                 In Winkelwagen
             </div>
           </div>
 
           <div class="productdescription">
+            <h1 class="bg-blue-green">Info</h1>
             <p><span v-html="product.finalText"></span><a v-if="product.finalText != product.longDescription"@click="readMore">Lees Meer</a></p>
           </div>
 
@@ -107,9 +108,12 @@
               <p class="ti-close remove" @click='removeFromBasket(value.id)'></p>
             </div>
           </div>
-          <div v-show="basket.totalPrice > 0" class=" items total w-100" style="color:black;">
-            {{basket.totalPrice}}
-            <span class="checkoutButton" @click="changePage('invoiceAddress')">Checkout</span>
+          <div v-show="basket.totalPrice > 0" class=" items total w-100">
+            <div class="totaltext">Totaal: </div>
+            <div class="totalprice">{{basket.totalPrice}}</div>
+            <div class="checkoutdiv">
+              <span class="checkoutButton grnbtn" @click="changePage('invoiceAddress')">Checkout</span>
+            </div>
           </div>
         </div>
       </section>
@@ -238,7 +242,7 @@
     </transition>
 
     <div class="footer">
-      <div class="listnav bg-green">
+      <div class="listnav bg-light-green">
         <!-- <p @click="test('asus')">test knop</p> -->
         <div class="w-third listnavbuttons" @click="pageBack()">
           <span class="ti-arrow-left" v-show="page != 'scan'"></span>
@@ -248,7 +252,7 @@
           <span class="ti-menu"></span>
         </div>
       </div>
-      <div class="bg-light-green tc">
+      <div class="bg-blue-green tc">
         <!-- Place logo here -->
         <img  class="logo" src="./assets/sellsmart_payoff_wit.png" alt="Sellsmart">
       </div>
