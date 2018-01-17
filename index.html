@@ -109,6 +109,7 @@
               <p class="ti-close remove" @click='removeFromBasket(value.id)'></p>
             </div>
           </div>
+          <p v-if="basket.length <= 0">U heeft geen producten in uw winkelmandje.</p>
           <div v-show="basket.totalPrice > 0" class=" items total w-100">
             <div class="totaltext">Totaal: </div>
             <div class="totalprice">{{basket.totalPrice}}</div>
