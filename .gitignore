@@ -57,6 +57,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# custom excludes
+scandog
+
 Design sellsmart qrcode/alternatief resultaten pagina.jpg
 Design sellsmart qrcode/Bestel gegevens.jpg
 Design sellsmart qrcode/Home.jpg
