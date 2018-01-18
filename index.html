@@ -154,11 +154,14 @@
       <!-- shipping address page -->
 
       <section v-if="page == 'shipAddress'" class="address_page page fl w-100" key="shipAddress">
-        <h1>Verzend Adres</h1>
-        <input type="radio" id="useAddress" v-bind:value="false" v-model="altAddress" selected><label for="useAddress">Gebruik Factuur Adres</label></input>
-
-        <br>
-        <input type="radio" id="newAddress" v-bind:value="true" v-model="altAddress"><label for="newAddress">Gebruik Ander Adres</label></input>
+        <div>
+          <h1>Verzend Adres</h1>
+        </div>
+        <div class="choosenewadress">
+          <input type="radio" id="useAddress" v-bind:value="false" v-model="altAddress" selected><label for="useAddress">Gebruik Factuur Adres</label></input>
+          <br>
+          <input type="radio" id="newAddress" v-bind:value="true" v-model="altAddress"><label for="newAddress">Gebruik Ander Adres</label></input>
+        </div>
 
         <form class="form" v-on:submit.prevent="setShippingAddress()"  method="POST" action="">
           <transition name="open" mode="out-in">

@@ -607,6 +607,12 @@ color: #65AD45;
    color: #000;
  }
 
+.choosenewadress {
+  padding: 0px 15px;
+  margin-top: 5px;
+
+}
+
 @media screen and (min-width: 766px) {
   .productinfo {
     font-size: 25px;
