@@ -218,17 +218,11 @@
               <div class="check"></div>
             </li>
           </ul>
-          <input type="submit" value="Verder">
-        </form>
-      </section>
-
-      <!-- Create order page -->
-
-      <section v-if="page == 'order'" class="order_page page fl w-100" key="order">
-        <div class="tosContainer">
+          <div class="tosContainer">
           <input type="checkbox" id="tosCheck" v-model="acceptTermsAndConditions" value="true"> <label for="tosCheck">Ik accepteer de </label><a @click="changePage('terms')">algemene voorwaarden</a> </input>
-        </div>
-        <input type="submit" value="Bestel" @click="setOrder()">
+          </div>
+          <input type="submit" value="Bestel">
+        </form>
       </section>
 
       <!-- Terms of service -->
