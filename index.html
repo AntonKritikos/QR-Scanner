@@ -155,10 +155,16 @@
 
       <section v-if="page == 'shipAddress'" class="address_page page fl w-100" key="shipAddress">
         <h1>Verzend Adres</h1>
-        <input type="radio" id="useAddress" v-bind:value="false" v-model="altAddress" selected><label for="useAddress">Gebruik Factuur Adres</label></input>
+        <div class="methodSelect w-100 bg-white">
+          <div class="">
+            <input type="radio" id="useAddress" v-bind:value="false" v-model="altAddress" selected><label for="useAddress">Gebruik Factuur Adres</label></input>
 
-        <br>
-        <input type="radio" id="newAddress" v-bind:value="true" v-model="altAddress"><label for="newAddress">Gebruik Ander Adres</label></input>
+          </div>
+          <div class="">
+            <input type="radio" id="newAddress" v-bind:value="true" v-model="altAddress"><label for="newAddress">Gebruik Ander Adres</label></input>
+
+          </div>
+        </div>
 
         <form class="form" v-on:submit.prevent="setShippingAddress()"  method="POST" action="">
           <transition name="open" mode="out-in">
@@ -193,13 +199,10 @@
 
       <section v-if="page == 'shipSelect'" class="shipping_page page fl w-100" key="order">
         <form class="container" method="post" v-on:submit.prevent="setShippingMethod()">
-          <ul>
-            <li class="shipMethods methodSelect" v-for="(value, index) in shippingMethods">
-              <input type="radio" v-bind:name="value.name" v-bind:id="value.id" v-bind:value="value.id" v-model="selectedShipMethod" required >
-              <label v-bind:for="value.id">{{value.name}}</label>
-              <div class="check"></div>
-            </li>
-          </ul>
+            <div class="shipMethods methodSelect w-100 bg-white" v-for="(value, index) in shippingMethods">
+                <input type="radio" v-bind:name="value.name" v-bind:id="value.id" v-bind:value="value.id" v-model="selectedShipMethod" required >
+                <label v-bind:for="value.id">{{value.name}}</label>
+            </div>
           <input type="submit" value="Verder">
         </form>
       </section>
@@ -208,13 +211,12 @@
 
       <section v-if="page == 'paySelect'" class="payment_page page fl w-100" key="paySelect">
         <form class="container" action="index.html" method="post" v-on:submit.prevent="setPaymentMethod()">
-          <ul>
-            <li class="payMethods methodSelect" v-for="(value, index) in payMethods">
+          <div class="payMethods methodSelect w-100 bg-white" v-for="(value, index) in payMethods">
+            <div class="">
               <input type="radio" name="paymentMethod" v-bind:id="value.id" v-bind:value="value.id" v-model="selectedPayMethod">
               <label v-bind:for="value.id">{{value.displayName}}</label>
-              <div class="check"></div>
-            </li>
-          </ul>
+            </div>
+          </div>
           <input type="submit" value="Verder">
         </form>
       </section>
