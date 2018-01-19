@@ -365,7 +365,7 @@ input:focus {
 .invoice_page, .address_page{
   width: 100%;
 }
-.invoice_page h1, .address_page h1{
+.page h1:first-of-type{
   margin: 0;
   background-color: #65AD63;
   width: 100%;
@@ -436,9 +436,6 @@ input:focus {
 }
 .form .dropDefault{
   color: #75758A
-}
-.shipping_page{
-  background-color: #B6D8A6;
 }
 .productname {
   margin-top: 10px;

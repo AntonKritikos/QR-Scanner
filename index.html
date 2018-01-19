@@ -198,6 +198,7 @@
       <!-- Select shipping method page -->
 
       <section v-if="page == 'shipSelect'" class="shipping_page page fl w-100" key="order">
+        <h1>Verzend methode</h1>
         <form class="container" method="post" v-on:submit.prevent="setShippingMethod()">
             <div class="shipMethods methodSelect w-100 bg-white" v-for="(value, index) in shippingMethods">
                 <input type="radio" v-bind:name="value.name" v-bind:id="value.id" v-bind:value="value.id" v-model="selectedShipMethod" required >
@@ -210,6 +211,7 @@
       <!-- Select shipping method page -->
 
       <section v-if="page == 'paySelect'" class="payment_page page fl w-100" key="paySelect">
+        <h1>Betaal methode</h1>
         <form class="container" action="index.html" method="post" v-on:submit.prevent="setPaymentMethod()">
           <div class="payMethods methodSelect w-100 bg-white" v-for="(value, index) in payMethods">
             <div class="">
@@ -227,6 +229,7 @@
       <!-- Terms of service -->
 
       <section v-if="page == 'terms'" class="terms_page page fl w-100" key="terms">
+        <h1>Algemene voorwaarden</h1>
         <terms-of-service>
         </terms-of-service>
       </section>
