@@ -139,6 +139,7 @@ a:hover{
 
 .product_page {
   z-index: 40;
+  overflow: auto;
 }
 
 .basket_page {
@@ -367,7 +368,7 @@ input:focus {
 .invoice_page, .address_page{
   width: 100%;
 }
-.page h1:first-of-type{
+.page > h1:first-of-type{
   margin: 0;
   background-color: #65AD63;
   width: 100%;
