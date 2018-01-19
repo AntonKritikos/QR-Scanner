@@ -277,6 +277,14 @@ visibility: hidden;
   display: block;
 }
 
+
+.chooseadress label {
+  width: calc(50% - 20px);
+  padding: 10px;
+  display: block;
+  float: left;
+}
+
 .methodSelect input[type=radio]:checked ~ label{
 background-color: #639A88;
 color: #FFFFFF;
