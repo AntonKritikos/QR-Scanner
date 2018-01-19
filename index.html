@@ -110,12 +110,12 @@
             </div>
           </div>
           <p v-if="basket.length <= 0">U heeft geen producten in uw winkelmandje.</p>
-          <div v-show="basket.totalPrice > 0" class=" items total w-100">
-            <div class="totaltext">Totaal: </div>
-            <div class="totalprice">{{basket.totalPrice}}</div>
-            <div class="checkoutdiv">
-              <span class="checkoutButton grnbtn" @click="changePage('invoiceAddress')">Checkout</span>
-            </div>
+        </div>
+        <div v-show="basket.totalPrice > 0" class=" items total w-100">
+          <div class="totaltext">Totaal: </div>
+          <div class="totalprice">{{basket.totalPrice}}</div>
+          <div class="checkoutdiv">
+            <span class="checkoutButton grnbtn" @click="changePage('invoiceAddress')">Checkout</span>
           </div>
         </div>
       </section>
@@ -217,17 +217,11 @@
               <label v-bind:for="value.id">{{value.displayName}}</label>
             </div>
           </div>
-          <input type="submit" value="Verder">
+          <div class="tosContainer">
+            <input type="checkbox" id="tosCheck" v-model="acceptTermsAndConditions" value="true"> <label for="tosCheck">Ik accepteer de </label><a @click="changePage('terms')">algemene voorwaarden</a> </input>
+          </div>
+          <input type="submit" value="Bestel">
         </form>
-      </section>
-
-      <!-- Create order page -->
-
-      <section v-if="page == 'order'" class="order_page page fl w-100" key="order">
-        <div class="tosContainer">
-          <input type="checkbox" id="tosCheck" v-model="acceptTermsAndConditions" value="true"> <label for="tosCheck">Ik accepteer de </label><a @click="changePage('terms')">algemene voorwaarden</a> </input>
-        </div>
-        <input type="submit" value="Bestel" @click="setOrder()">
       </section>
 
       <!-- Terms of service -->

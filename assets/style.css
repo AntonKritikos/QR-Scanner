@@ -126,7 +126,7 @@ a:hover{
   position: absolute;
   width: 100%;
   height: Calc(100% - 76px);
-  overflow: auto;
+  overflow: hidden;
 }
 
 .list_page {
@@ -228,8 +228,13 @@ a:hover{
 }
 
 .itemlist {
-  height: calc(100% - 89px);
+  height: 100%;
   background-color: #ececec;
+  overflow: auto;
+}
+
+.basket_page .itemlist{
+  height: calc(100% - 94px);
 }
 
 .items {
@@ -513,9 +518,8 @@ input[Type='submit']:hover{
 }
 
 .total {
-  position: fixed;
+  position: relative;
   left: 0;
-  bottom: 76px;
   background-color: #006c3d;
 }
 
@@ -542,6 +546,12 @@ input[Type='submit']:hover{
  .itemlist > p{
    color: #000;
  }
+
+.choosenewadress {
+  padding: 0px 15px;
+  margin-top: 5px;
+
+}
 
 @media screen and (min-width: 766px) {
   .productinfo {

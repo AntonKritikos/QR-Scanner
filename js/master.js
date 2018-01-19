@@ -303,7 +303,7 @@ var vue = new Vue({
 
     getOrder(id){
       // Requires user to be logged in so currently does not work
-      a = this.requestJson('GET', this.createUrl(id), true);
+      // a = this.requestJson('GET', this.createUrl(id), true);
     },
 
     listScroll() {
@@ -530,14 +530,11 @@ var vue = new Vue({
         };
         b = this.requestJson('POST', this.createUrl('baskets/' + this.getCookie('basket-id') + '/payments'), true, data);
         if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
-          this.changePage('order');
+          this.setOrder();
         }
         else {
           alert(b)
         }
-      }
-      else {
-        this.changePage('order');
       }
     },
 
@@ -555,7 +552,7 @@ var vue = new Vue({
         if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
           this.deleteAllCookies()
           this.changePage('thankYou');
-          getOrder(a.uri)
+          this.getOrder(a.uri)
         }
 
       }
@@ -601,7 +598,7 @@ var vue = new Vue({
 
     pageBack() {
       if (this.page == "terms") {
-        this.changePage('order');
+        this.changePage('paySelect');
         return true
       }
       else if (this.page == "order") {
