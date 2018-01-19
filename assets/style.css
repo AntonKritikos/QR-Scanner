@@ -263,7 +263,7 @@ a:hover{
 .methodSelect {
   overflow: hidden;
   display: inline-block;
-  border-top:  1px solid #E1E8EE;
+  border-bottom:  1px solid #000;
 }
 
 .methodSelect input[type=radio]{
