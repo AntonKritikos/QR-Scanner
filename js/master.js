@@ -287,11 +287,8 @@ var vue = new Vue({
       if (a.elements.length > 0 && this.getObjectData(a.elements, this.selectedPayMethod, 'title')) {
         return false
       }
-      else {
-        if (a.elements.length > 0) {
-          this.removePaymentMethod(this.getObjectData(a.elements, 'uri'));
-        }
-
+      else if (a.elements.length > 0){
+        this.removePaymentMethod(this.getObjectData(a.elements, 'uri'));
         return true
       }
     },
@@ -523,7 +520,7 @@ var vue = new Vue({
 
     setPaymentMethod(){
       a = this.getPaymentMethod();
-      if (a) {
+      // if (a) {
         data = {
           "name": this.selectedPayMethod,
           "type": "Payment"
@@ -535,7 +532,10 @@ var vue = new Vue({
         else {
           alert(b)
         }
-      }
+      // }
+      // else {
+      //   this.setOrder();
+      // }
     },
 
     removePaymentMethod(uri){
@@ -549,6 +549,7 @@ var vue = new Vue({
           "acceptTermsAndConditions": "true"
         };
         a = this.requestJson('POST', this.createUrl('orders/'), true, data);
+        console.log(a);
         if (typeof a !== 'string' || !a instanceof String || a.indexOf("DuplicateAddress") !== -1) {
           this.deleteAllCookies()
           this.changePage('thankYou');
